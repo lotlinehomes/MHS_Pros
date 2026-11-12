@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-label="Placeholder: Video thumbnail: dealer in front of a newly set home">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1c3150"/><stop offset="1" stop-color="#0f1f33"/></linearGradient></defs>
+  <rect width="1280" height="720" fill="url(#g)"/>
+  <g transform="translate(592 259.2) scale(1.2)" opacity="0.6">
+          <circle cx="40" cy="40" r="40" fill="#f97316"/>
+          <polygon points="30,22 30,58 62,40" fill="#0b1726"/>
+        </g>
+  <text x="640" y="614.4" fill="#ffffff" font-family="system-ui, sans-serif" font-size="33" font-weight="700" text-anchor="middle">PHOTO PLACEHOLDER</text>
+  <text x="640" y="660.6" fill="#c7d4e6" font-family="system-ui, sans-serif" font-size="26" text-anchor="middle">Video thumbnail: dealer in front of a newly set home</text>
+  <text x="640" y="696.9" fill="#8fa6c2" font-family="ui-monospace, monospace" font-size="20" text-anchor="middle">video-poster-dealer-testimonial · 1280×720</text>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120" role="img" aria-label="Badge placeholder: ASSOC. MEMBER PLACEHOLDER">
+  <circle cx="60" cy="60" r="56" fill="#ffffff" stroke="#0f1f33" stroke-width="4"/>
+  <circle cx="60" cy="60" r="46" fill="none" stroke="#f97316" stroke-width="2" stroke-dasharray="4 4"/>
+  <path d="M60 24 l6 12 13 2 -9.5 9 2.3 13 -11.8 -6.2 -11.8 6.2 2.3 -13 -9.5 -9 13 -2 Z" fill="#f97316"/>
+  <text x="60" y="80" fill="#0f1f33" font-family="system-ui, sans-serif" font-size="10" font-weight="800" text-anchor="middle">ASSOC. MEMBER</text>
+  <text x="60" y="93" fill="#475569" font-family="system-ui, sans-serif" font-size="8" font-weight="600" text-anchor="middle">PLACEHOLDER</text>
+</svg>
