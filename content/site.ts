@@ -66,8 +66,9 @@ export const seo = {
   title: "Mobile Home Setup Pros | Manufactured & Mobile Home Installation",
   description:
     "40 years of combined experience setting manufactured and mobile homes. Blocking, leveling, anchoring, marriage lines, skirting, and inspection-ready installs for dealers, developers, investors, and homeowners. Get a setup quote.",
-  // Real site URL comes from the NEXT_PUBLIC_SITE_URL env var. This is only a fallback.
-  fallbackUrl: "https://www.example.com", // PLACEHOLDER — never a real domain until you own one
+  // The official site address. Used for the canonical URL, share previews, sitemap, and Google's business data.
+  // (Setting the NEXT_PUBLIC_SITE_URL env var in Vercel overrides this.)
+  siteUrl: "https://mobilehomesetuppros.com",
   keywords: [
     "mobile home setup",
     "manufactured home installation",
