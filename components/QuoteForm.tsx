@@ -350,10 +350,8 @@ export function QuoteForm() {
           t.timing,
           6,
           <>
-            <div className="grid gap-5 sm:grid-cols-2">
-              {field("targetDate", "Target setup date", { type: "date" }, true)}
-              {field("heardFrom", "How did you hear about us?", {}, true)}
-            </div>
+            {radios("timeframe", "When do you need it?", o.timeframe, { hint: "Our team will reach out to schedule your exact install date.", cols: "grid-cols-2 sm:grid-cols-3" })}
+            {field("heardFrom", "How did you hear about us?", {}, true)}
 
             <div>
               <label htmlFor={fid("photos")} className="block text-sm font-bold text-navy-900">

@@ -428,6 +428,8 @@ export const quoteForm = {
     water: ["City / public", "Well", "Not yet", "Not sure"],
     sewer: ["City / public", "Septic", "Not yet", "Not sure"],
     skirting: ["None", "Vinyl", "Brick", "Block"],
+    // LotStack's own timeframe values — sent as-is. The team schedules the actual date.
+    timeframe: ["As soon as possible", "Within 30 days", "1–3 months", "3+ months", "Not sure yet"],
   },
   // Optional add-on services (checkboxes). Keys are fixed (lib/lotstack.ts maps them to LotStack
   // price-list items); labels and hints are editable.

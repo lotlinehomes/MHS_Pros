@@ -147,7 +147,7 @@ What the form asks (all choices live in `quoteForm` in `content/site.ts`):
 3. **The home:** width, number of homes, size, manufacturer, delivery date, where it is now, and whether they still need to buy a home. If they say yes, there's an OK-to-share checkbox for CostPlus Home Co.
 4. **Site & foundation:** pad and foundation (required), plus optional site questions: cleared/level, truck access, power, water, sewer, permit started.
 5. **Services:** skirting (none, vinyl, brick or block), plus checkboxes that map to Pricebook items. Deck and demolition ask for square footage.
-6. **Timing & details:** target date, how they heard about us, up to 6 photos, notes, and texting consent.
+6. **Timing & details:** "When do you need it?" (As soon as possible / Within 30 days / 1–3 months / 3+ months / Not sure yet), how they heard about us, up to 6 photos, notes, and texting consent. Customers never pick a date; the team schedules it in LotStack.
 
 How it flows (`app/api/quote/route.ts` → `lib/lotstack.ts`):
 
