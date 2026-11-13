@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" role="img" aria-label="Headshot placeholder: homeowners">
-  <rect width="96" height="96" fill="#dbe4f0"/>
-  <circle cx="48" cy="38" r="17" fill="#8fa6c2"/>
-  <path d="M14 96 C16 70 32 60 48 60 C64 60 80 70 82 96 Z" fill="#8fa6c2"/>
-  <text x="48" y="44" fill="#0f1f33" font-family="system-ui, sans-serif" font-size="14" font-weight="800" text-anchor="middle">TM</text>
+  <rect width="96" height="96" fill="#efdfc5"/>
+  <circle cx="48" cy="38" r="17" fill="#9fb0c6"/>
+  <path d="M14 96 C16 70 32 60 48 60 C64 60 80 70 82 96 Z" fill="#9fb0c6"/>
+  <text x="48" y="44" fill="#13263f" font-family="system-ui, sans-serif" font-size="14" font-weight="800" text-anchor="middle">TM</text>
 </svg>

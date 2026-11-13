@@ -1,23 +1,52 @@
 @import "tailwindcss";
 
-/* Brand palette — sturdy navy + safety orange. Change colors here only. */
+/*
+ * Brand palette — pulled straight from the Mobile Home Setup Pros logo:
+ * deep navy script, brick-red ribbon, warm cream paper. Change colors here only.
+ */
 @theme {
-  --color-navy-950: #0b1726;
-  --color-navy-900: #0f1f33;
-  --color-navy-800: #1c3150;
-  --color-navy-700: #2c4462;
-  --color-navy-100: #e8eef6;
-  --color-navy-50: #f4f7fb;
-  --color-accent: #f97316;
-  --color-accent-hover: #ea580c;
-  --color-accent-soft: #fff1e6;
+  --color-navy-950: #0b1a2c;
+  --color-navy-900: #13263f;
+  --color-navy-800: #1d3557;
+  --color-navy-700: #2b4a70;
 
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --color-brick: #a8231d;
+  --color-brick-dark: #84100b;
+
+  --color-cream-50: #fcf6ec;
+  --color-cream: #f6ead6;
+  --color-cream-200: #efdfc5;
+  --color-cream-300: #e2caa5;
+
+  /* Muted body text on cream (7.5:1 contrast). */
+  --color-ink: #3d4a5c;
+
+  /* Aliases so form/utility code reads naturally. */
+  --color-accent: var(--color-brick);
+  --color-accent-hover: var(--color-brick-dark);
+
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-slab), Georgia, "Times New Roman", serif;
+  --font-script: var(--font-script-face), "Brush Script MT", cursive;
+}
+
+/* Hard, offset "screen-print" shadows. */
+@utility shadow-retro {
+  box-shadow: 6px 6px 0 0 var(--color-navy-900);
+}
+@utility shadow-retro-sm {
+  box-shadow: 3px 3px 0 0 var(--color-navy-900);
 }
 
 html {
-  scroll-padding-top: 5rem; /* keeps anchored sections clear of the sticky header */
+  scroll-padding-top: 6rem; /* keeps anchored sections clear of the sticky header */
   -webkit-text-size-adjust: 100%;
+}
+
+body {
+  @apply bg-cream font-sans text-navy-900 antialiased;
+  /* Subtle paper grain, like the logo's background. Tiny inline SVG, no request. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .32 0 0 0 0 .18 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -25,7 +54,7 @@ html {
     scroll-behavior: smooth;
   }
 
-  /* Scroll-reveal. Only hides content when JS has flagged the page (see RevealObserver),
+  /* Scroll-reveal. Only hides content once JS has flagged the page (see RevealObserver),
      so no-JS visitors and crawlers always see everything. */
   html.reveal-ready [data-reveal] {
     opacity: 0;
@@ -40,13 +69,9 @@ html {
   }
 }
 
-body {
-  @apply bg-white font-sans text-slate-800 antialiased;
-}
-
 :focus-visible {
-  outline: 3px solid var(--color-accent);
-  outline-offset: 2px;
+  outline: 3px solid var(--color-brick);
+  outline-offset: 3px;
 }
 
 /* FAQ: native <details> chevron */

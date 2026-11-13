@@ -86,12 +86,14 @@ export function Icon({ name, className = "h-6 w-6", ...rest }: { name: IconName 
   );
 }
 
-export function Stars({ rating, className = "h-5 w-5" }: { rating: number; className?: string }) {
+export function Stars({ rating, className = "h-5 w-5", tone = "light" }: { rating: number; className?: string; tone?: "light" | "dark" }) {
   const full = Math.round(rating);
+  const on = tone === "dark" ? "text-cream-50" : "text-brick";
+  const off = tone === "dark" ? "text-navy-700" : "text-cream-300";
   return (
     <span className="inline-flex items-center gap-0.5" role="img" aria-label={`${rating} out of 5 stars`}>
       {Array.from({ length: 5 }, (_, i) => (
-        <svg key={i} viewBox="0 0 20 20" aria-hidden="true" className={`${className} ${i < full ? "text-amber-400" : "text-slate-300"}`}>
+        <svg key={i} viewBox="0 0 20 20" aria-hidden="true" className={`${className} ${i < full ? on : off}`}>
           <path
             fill="currentColor"
             d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.8l-5.2 2.8 1-5.8L1.5 7.7l5.9-.9L10 1.5z"

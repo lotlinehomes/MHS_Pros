@@ -8,7 +8,7 @@ import { Icon } from "@/components/Icon";
 type Status = "idle" | "submitting" | "success" | "error";
 
 const inputCls =
-  "mt-1.5 block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-3 text-base text-navy-950 shadow-sm placeholder:text-slate-400 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/40 aria-[invalid=true]:border-red-600";
+  "mt-1.5 block w-full rounded-lg border-2 border-navy-900/40 bg-white px-3.5 py-3 text-base text-navy-950 placeholder:text-ink/60 focus:border-navy-900 focus:outline-none focus:ring-2 focus:ring-brick/40 aria-[invalid=true]:border-red-700";
 
 export function QuoteForm() {
   const [values, setValues] = useState<QuoteInput>(emptyQuote);
@@ -59,14 +59,14 @@ export function QuoteForm() {
         ref={successRef}
         tabIndex={-1}
         role="status"
-        className="flex min-h-[28rem] flex-col items-center justify-center rounded-2xl bg-white p-8 text-center shadow-xl outline-none"
+        className="flex min-h-[28rem] flex-col items-center justify-center rounded-xl border-2 border-navy-900 bg-cream-50 p-8 text-center shadow-[6px_6px_0_0_var(--color-brick)] outline-none"
       >
-        <span className="mb-5 grid h-16 w-16 place-items-center rounded-full bg-green-100 text-green-700">
+        <span className="mb-5 grid h-16 w-16 place-items-center rounded-full border-2 border-navy-900 bg-brick text-cream-50">
           <Icon name="check" className="h-9 w-9" />
         </span>
-        <p className="text-2xl font-extrabold text-navy-900">{quoteForm.successHeading}</p>
-        <p className="mt-3 text-lg text-slate-600">{quoteForm.successBody}</p>
-        <a href={business.phoneHref} className="mt-5 inline-flex items-center gap-2 text-lg font-bold text-orange-700 underline-offset-4 hover:underline">
+        <p className="font-display text-2xl font-extrabold text-navy-900">{quoteForm.successHeading}</p>
+        <p className="mt-3 text-lg text-ink">{quoteForm.successBody}</p>
+        <a href={business.phoneHref} className="mt-5 inline-flex items-center gap-2 font-display text-xl font-extrabold text-brick underline-offset-4 hover:underline">
           <Icon name="phone" className="h-5 w-5" />
           {business.phoneDisplay}
         </a>
@@ -81,8 +81,8 @@ export function QuoteForm() {
     optional = false,
   ) => (
     <div>
-      <label htmlFor={fid(key)} className="block text-sm font-semibold text-navy-900">
-        {label} {optional ? <span className="font-normal text-slate-500">(optional)</span> : <span className="text-red-700" aria-hidden="true">*</span>}
+      <label htmlFor={fid(key)} className="block text-sm font-bold text-navy-900">
+        {label} {optional ? <span className="font-normal text-ink">(optional)</span> : <span className="text-red-700" aria-hidden="true">*</span>}
       </label>
       <input
         id={fid(key)}
@@ -104,8 +104,8 @@ export function QuoteForm() {
   );
 
   return (
-    <form ref={formRef} onSubmit={onSubmit} noValidate className="rounded-2xl bg-white p-6 shadow-xl sm:p-8" aria-describedby={fid("intro")}>
-      <p id={fid("intro")} className="mb-6 text-slate-600">
+    <form ref={formRef} onSubmit={onSubmit} noValidate className="rounded-xl border-2 border-navy-900 bg-cream-50 p-6 shadow-[6px_6px_0_0_var(--color-brick)] sm:p-8" aria-describedby={fid("intro")}>
+      <p id={fid("intro")} className="mb-6 text-ink">
         {quoteForm.intro} <span className="text-sm">Fields marked <span className="text-red-700">*</span> are required.</span>
       </p>
 
@@ -115,16 +115,16 @@ export function QuoteForm() {
         {field("email", "Email", { type: "email", autoComplete: "email", inputMode: "email" })}
 
         <fieldset className="sm:col-span-2" aria-describedby={errors.homeType ? fid("homeType-err") : undefined}>
-          <legend className="text-sm font-semibold text-navy-900">
+          <legend className="text-sm font-bold text-navy-900">
             Home type <span className="text-red-700" aria-hidden="true">*</span>
           </legend>
-          <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
             {HOME_TYPES.map((t) => (
               <label
                 key={t}
-                className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-slate-300 px-3.5 py-3 text-base font-medium text-navy-900 has-[:checked]:border-accent has-[:checked]:bg-accent-soft has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent"
+                className="flex cursor-pointer items-center gap-2.5 whitespace-nowrap rounded-lg border-2 border-navy-900/40 bg-white px-3.5 py-3 text-base font-medium text-navy-900 has-[:checked]:border-navy-900 has-[:checked]:bg-cream-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brick"
               >
-                <input type="radio" name="homeType" required value={t} checked={values.homeType === t} onChange={() => set("homeType", t)} className="h-4 w-4 accent-orange-600" />
+                <input type="radio" name="homeType" required value={t} checked={values.homeType === t} onChange={() => set("homeType", t)} className="h-4 w-4 accent-brick" />
                 {t}
               </label>
             ))}
@@ -145,8 +145,8 @@ export function QuoteForm() {
         </div>
 
         <div className="sm:col-span-2">
-          <label htmlFor={fid("notes")} className="block text-sm font-semibold text-navy-900">
-            Notes <span className="font-normal text-slate-500">(optional)</span>
+          <label htmlFor={fid("notes")} className="block text-sm font-bold text-navy-900">
+            Notes <span className="font-normal text-ink">(optional)</span>
           </label>
           <textarea
             id={fid("notes")}
@@ -167,13 +167,13 @@ export function QuoteForm() {
         </div>
 
         <div className="sm:col-span-2">
-          <label className="flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-slate-600">
+          <label className="flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-ink">
             <input
               type="checkbox"
               name="smsConsent"
               checked={values.smsConsent}
               onChange={(e) => set("smsConsent", e.target.checked)}
-              className="mt-1 h-5 w-5 shrink-0 rounded accent-orange-600"
+              className="mt-1 h-5 w-5 shrink-0 rounded accent-brick"
             />
             <span>{quoteForm.smsConsentLabel}</span>
           </label>
@@ -190,12 +190,12 @@ export function QuoteForm() {
       <button
         type="submit"
         disabled={status === "submitting"}
-        className="mt-6 inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-xl bg-accent px-6 py-4 text-lg font-extrabold text-navy-950 shadow-lg shadow-orange-900/20 transition-colors hover:bg-accent-hover disabled:cursor-wait disabled:opacity-70"
+        className="mt-6 inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-lg border-2 border-navy-900 bg-brick px-6 py-4 font-display text-lg font-extrabold uppercase italic tracking-wide text-cream-50 shadow-retro-sm transition hover:bg-brick-dark disabled:cursor-wait disabled:opacity-70"
       >
         {status === "submitting" ? quoteForm.submittingLabel : quoteForm.submitLabel}
         {status !== "submitting" && <Icon name="arrow" className="h-5 w-5" />}
       </button>
-      <p className="mt-3 text-center text-sm text-slate-500">{quoteForm.privacyNote}</p>
+      <p className="mt-3 text-center text-sm text-ink">{quoteForm.privacyNote}</p>
     </form>
   );
 }

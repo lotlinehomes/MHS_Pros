@@ -67,9 +67,24 @@ That one file controls everything on the page. You shouldn't need to touch any c
 
 When you change the phone number, update **both** `phoneDisplay` (what people see) and `phoneHref` / `smsHref` (what gets dialed).
 
-### Colors → `app/globals.css`
+### Brand look → `app/globals.css` + `app/layout.tsx`
 
-The brand palette (navy + safety orange) is defined once in the `@theme` block at the top.
+The look is matched to the logo: retro Americana, cream paper, navy, and brick red.
+
+- **Colors** are defined once in the `@theme` block at the top of `app/globals.css` (`navy-*`, `brick`, `cream-*`, `ink`). Change a hex value there and it updates everywhere.
+- **Fonts** are loaded in `app/layout.tsx` from Google Fonts at build time (self-hosted, no extra requests): **Yellowtail** (script, like "Mobile Home"), **Bitter** (bold italic slab, like "SETUP PROS"), and **Libre Franklin** (body text).
+- The hard offset "print" shadows are the `shadow-retro` / `shadow-retro-sm` utilities in `globals.css`.
+
+### Logo & icons → `public/brand/` and `app/`
+
+| File                                   | What it is                                                                    |
+| -------------------------------------- | ----------------------------------------------------------------------------- |
+| `public/brand/mhs-pros-logo-header.webp` | Logo without the tagline lines, used in the sticky header                    |
+| `public/brand/mhs-pros-logo-full.webp`   | Full logo lockup with tagline, used in the footer                            |
+| `app/icon.png`, `app/apple-icon.png`     | Browser tab / home-screen icon (the crew guy's face)                         |
+| `app/opengraph-image.jpg`                | Image shown when the link is shared (1200×630). Alt text is in `opengraph-image.alt.txt` |
+
+Both logo files have a transparent background, so they sit cleanly on the cream page. To swap the logo, replace those files (keep the names), or point `business.logo` / `business.logoFull` in `content/site.ts` at new files and update their `width`/`height`.
 
 ---
 
@@ -79,7 +94,6 @@ Every placeholder lives in **`public/placeholders/`**. File names describe the r
 
 | Placeholder file                                   | Real photo that goes there                      |
 | -------------------------------------------------- | ----------------------------------------------- |
-| `logo-mhs-pros-wordmark.svg`                       | Your logo (about 4:1 wide)                      |
 | `hero-crew-setting-home.svg`                       | Crew setting a home on piers (wide, ~1600×1100) |
 | `logo-partner-*.svg` (6)                           | Partner dealer / developer logos                |
 | `testimonial-headshot-*.svg` (3)                   | Customer headshots (square)                     |
@@ -98,7 +112,7 @@ JPG/PNG/WebP photos are resized and converted to AVIF/WebP automatically by `nex
 
 **Remote images:** `next.config.ts` allows `https://placehold.co`. If you host photos on a CDN, add its hostname to `images.remotePatterns` there.
 
-**Social share image:** generated automatically from the content file by `app/opengraph-image.tsx`. To use a real photo, delete that file and add `app/opengraph-image.jpg` (1200×630).
+**Social share image:** `app/opengraph-image.jpg` (the logo on cream, 1200×630). Replace that file to change it.
 
 ---
 
@@ -118,10 +132,11 @@ Title, description, Open Graph/Twitter tags, `HomeAndConstructionBusiness` JSON-
 
 ```
 app/
-  layout.tsx              metadata, font
+  layout.tsx              metadata, brand fonts
   page.tsx                section order + JSON-LD
   globals.css             palette + scroll-reveal
-  opengraph-image.tsx     generated share image
+  opengraph-image.jpg     share image (logo)
+  icon.png, apple-icon.png  favicon / home-screen icon
   api/quote/route.ts      form endpoint (TODOs for email + LotStack)
 components/
   sections.tsx            every page section
@@ -131,5 +146,6 @@ components/
   Icon.tsx                inline SVG icons + star rating
 content/site.ts           ← ALL content lives here
 lib/quote.ts              shared form validation
+public/brand/             real logo files
 public/placeholders/      placeholder images to replace
 ```

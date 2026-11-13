@@ -44,12 +44,18 @@ export const business = {
   hours: "Mon–Fri 7am–6pm · Sat by appointment", // PLACEHOLDER
   licenseLine: "Licensed & insured · License # PLACEHOLDER", // PLACEHOLDER — real license number(s) go here
   foundedYear: 2025, // PLACEHOLDER
+  // Brand logo. The header uses a tighter crop (no tagline lines); the full lockup is used in the footer.
   logo: {
-    // PLACEHOLDER — swap for your real logo (SVG or PNG, roughly 4:1 wide).
-    src: "/placeholders/logo-mhs-pros-wordmark.svg",
+    src: "/brand/mhs-pros-logo-header.webp",
     alt: "Mobile Home Setup Pros logo",
-    width: 200,
-    height: 48,
+    width: 1260,
+    height: 800,
+  } satisfies ImageRef,
+  logoFull: {
+    src: "/brand/mhs-pros-logo-full.webp",
+    alt: "Mobile Home Setup Pros — Site Prep, Installation, Finishing — 40 Years of Experience",
+    width: 1536,
+    height: 1024,
   } satisfies ImageRef,
 };
 
@@ -62,7 +68,6 @@ export const seo = {
     "40 years of combined experience setting manufactured and mobile homes. Blocking, leveling, anchoring, marriage lines, skirting, and inspection-ready installs for dealers, developers, investors, and homeowners. Get a setup quote.",
   // Real site URL comes from the NEXT_PUBLIC_SITE_URL env var. This is only a fallback.
   fallbackUrl: "https://www.example.com", // PLACEHOLDER — never a real domain until you own one
-  ogImageAlt: "Mobile Home Setup Pros — inspection-ready manufactured home setup",
   keywords: [
     "mobile home setup",
     "manufactured home installation",
@@ -84,8 +89,10 @@ export const header = {
 // Hero
 // ---------------------------------------------------------------------------
 export const hero = {
-  eyebrow: "Manufactured & Mobile Home Setup",
-  headline: "40 years of setting homes. Level, anchored, and inspection-ready.",
+  eyebrow: "Site Prep ★ Installation ★ Finishing",
+  // Headline renders in two parts: bold slab line, then a red script line underneath.
+  headline: "40 years of setting homes.",
+  headlineAccent: "Level, anchored & inspection-ready.",
   subhead:
     "Our crews have set single- and multi-section homes for dealers, developers, investors, and families. We show up when we say, set it right, and hand you a home that passes the first time.",
   primaryCta: "Get My Setup Quote",

@@ -25,6 +25,20 @@ export function Section({
   );
 }
 
+/** ——— ★ ——— divider, like the rules on the logo. */
+export function StarRule({ tone = "light", className = "" }: { tone?: "light" | "dark"; className?: string }) {
+  const line = tone === "dark" ? "bg-cream/40" : "bg-brick";
+  return (
+    <div className={`flex items-center justify-center gap-3 ${className}`} aria-hidden="true">
+      <span className={`h-0.5 w-10 rounded-full sm:w-14 ${line}`} />
+      <span className={`text-sm ${tone === "dark" ? "text-cream-300" : "text-brick"}`}>★</span>
+      <span className={`text-base ${tone === "dark" ? "text-cream" : "text-brick"}`}>★</span>
+      <span className={`text-sm ${tone === "dark" ? "text-cream-300" : "text-brick"}`}>★</span>
+      <span className={`h-0.5 w-10 rounded-full sm:w-14 ${line}`} />
+    </div>
+  );
+}
+
 export function SectionHeading({
   id,
   eyebrow,
@@ -41,39 +55,58 @@ export function SectionHeading({
   align?: "center" | "left";
 }) {
   const dark = tone === "dark";
+  const center = align === "center";
   return (
-    <div className={`mb-10 max-w-3xl sm:mb-12 ${align === "center" ? "mx-auto text-center" : ""}`} data-reveal>
+    <div className={`mb-10 max-w-3xl sm:mb-12 ${center ? "mx-auto text-center" : ""}`} data-reveal>
       {eyebrow && (
-        <p className={`mb-3 text-sm font-bold uppercase tracking-[0.14em] ${dark ? "text-accent" : "text-orange-700"}`}>{eyebrow}</p>
+        <p className={`font-script text-3xl leading-none sm:text-4xl ${dark ? "text-cream-300" : "text-brick"}`}>{eyebrow}</p>
       )}
-      <h2 id={id} className={`text-3xl font-extrabold tracking-tight text-balance sm:text-4xl lg:text-5xl ${dark ? "text-white" : "text-navy-900"}`}>
+      <h2
+        id={id}
+        className={`mt-2 font-display text-3xl font-extrabold tracking-tight text-balance sm:text-4xl lg:text-5xl ${dark ? "text-cream-50" : "text-navy-900"}`}
+      >
         {heading}
       </h2>
-      {intro && <p className={`mt-4 text-lg leading-relaxed ${dark ? "text-slate-300" : "text-slate-600"}`}>{intro}</p>}
+      <StarRule tone={tone} className={`mt-4 ${center ? "" : "justify-start"}`} />
+      {intro && <p className={`mt-4 text-lg leading-relaxed ${dark ? "text-cream-200" : "text-ink"}`}>{intro}</p>}
     </div>
   );
 }
 
 const btnBase =
-  "inline-flex min-h-12 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-6 py-3 text-base font-bold transition-colors duration-150 focus-visible:outline-offset-4";
+  "inline-flex min-h-12 items-center justify-center gap-2 text-center sm:whitespace-nowrap rounded-lg border-2 px-5 sm:px-6 py-3 font-display text-base font-extrabold uppercase italic tracking-wide transition duration-150 motion-safe:hover:-translate-y-0.5 motion-safe:active:translate-y-0.5";
 
-export function QuoteButton({ children, className = "", size = "md" }: { children: React.ReactNode; className?: string; size?: "md" | "lg" }) {
+export function QuoteButton({
+  children,
+  className = "",
+  size = "md",
+  tone = "light",
+}: {
+  children: React.ReactNode;
+  className?: string;
+  size?: "md" | "lg";
+  /** "onBrick" = cream button for use on a red background. */
+  tone?: "light" | "dark" | "onBrick";
+}) {
+  const styles =
+    tone === "onBrick"
+      ? "border-navy-900 bg-cream-50 text-navy-900 shadow-retro-sm hover:bg-white"
+      : tone === "dark"
+        ? "border-cream-50 bg-brick text-cream-50 shadow-[3px_3px_0_0_var(--color-cream-50)] hover:bg-brick-dark"
+        : "border-navy-900 bg-brick text-cream-50 shadow-retro-sm hover:bg-brick-dark";
   return (
-    <a
-      href={QUOTE_ANCHOR}
-      className={`${btnBase} bg-accent text-navy-950 shadow-lg shadow-orange-900/20 hover:bg-accent-hover ${size === "lg" ? "px-8 text-lg" : ""} ${className}`}
-    >
+    <a href={QUOTE_ANCHOR} className={`${btnBase} ${styles} ${size === "lg" ? "text-lg sm:px-8" : ""} ${className}`}>
       {children}
       <Icon name="arrow" className="h-5 w-5" />
     </a>
   );
 }
 
-export function CallButton({ tone = "dark", className = "", label }: { tone?: "dark" | "light"; className?: string; label?: string }) {
+export function CallButton({ tone = "light", className = "", label }: { tone?: "dark" | "light"; className?: string; label?: string }) {
   const styles =
     tone === "dark"
-      ? "border-2 border-white/30 text-white hover:border-white hover:bg-white/10"
-      : "border-2 border-navy-900 text-navy-900 hover:bg-navy-900 hover:text-white";
+      ? "border-cream-50/70 text-cream-50 hover:border-cream-50 hover:bg-cream-50/10"
+      : "border-navy-900 bg-cream-50 text-navy-900 shadow-retro-sm hover:bg-white";
   return (
     <a href={business.phoneHref} className={`${btnBase} ${styles} ${className}`}>
       <Icon name="phone" className="h-5 w-5" />
@@ -82,20 +115,25 @@ export function CallButton({ tone = "dark", className = "", label }: { tone?: "d
   );
 }
 
-/** Repeating "Get a Quote" band placed between sections. */
+/** Repeating "Get a Quote" band between sections — styled like the logo's red ribbon. */
 export function CtaBand({ heading, body, button }: { heading: string; body: string; button: string }) {
   return (
-    <aside aria-label="Request a quote" className="bg-navy-900">
-      <Container className="flex flex-col items-start gap-6 py-10 sm:py-12 lg:flex-row lg:items-center lg:justify-between">
-        <div data-reveal>
-          <p className="text-2xl font-extrabold text-white sm:text-3xl">{heading}</p>
-          <p className="mt-2 text-lg text-slate-300">{body}</p>
-        </div>
-        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-          <QuoteButton>{button}</QuoteButton>
-          <CallButton />
-        </div>
-      </Container>
+    <aside aria-label="Request a quote" className="border-y-4 border-navy-900 bg-brick">
+      <div className="border-y-2 border-dashed border-cream/35">
+        <Container className="flex flex-col items-start gap-6 py-10 sm:py-12 lg:flex-row lg:items-center lg:justify-between">
+          <div data-reveal>
+            <p className="font-display text-2xl font-extrabold italic text-cream-50 sm:text-3xl">
+              <span aria-hidden="true" className="mr-2 text-cream-300">★</span>
+              {heading}
+            </p>
+            <p className="mt-2 text-lg text-cream-200">{body}</p>
+          </div>
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <QuoteButton tone="onBrick">{button}</QuoteButton>
+            <CallButton tone="dark" />
+          </div>
+        </Container>
+      </div>
     </aside>
   );
 }

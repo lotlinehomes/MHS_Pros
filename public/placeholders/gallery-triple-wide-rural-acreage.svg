@@ -1,16 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img" aria-label="Placeholder: Triple-section on rural acreage">
-  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1c3150"/><stop offset="1" stop-color="#0f1f33"/></linearGradient></defs>
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1d3557"/><stop offset="1" stop-color="#13263f"/></linearGradient></defs>
   <rect width="800" height="600" fill="url(#g)"/>
   <g transform="translate(170 204.00000000000003) scale(1)" opacity="0.55">
           <rect x="0" y="60" width="460" height="130" rx="6" fill="#3b5577"/>
           <polygon points="-10,62 230,0 470,62" fill="#2c4462"/>
-          <rect x="40" y="95" width="70" height="50" rx="3" fill="#8fa6c2"/>
-          <rect x="350" y="95" width="70" height="50" rx="3" fill="#8fa6c2"/>
-          <rect x="200" y="100" width="56" height="90" rx="3" fill="#f97316"/>
+          <rect x="40" y="95" width="70" height="50" rx="3" fill="#9fb0c6"/>
+          <rect x="350" y="95" width="70" height="50" rx="3" fill="#9fb0c6"/>
+          <rect x="200" y="100" width="56" height="90" rx="3" fill="#a8231d"/>
           <rect x="30" y="190" width="30" height="40" fill="#5c7391"/><rect x="120" y="190" width="30" height="40" fill="#5c7391"/><rect x="210" y="190" width="30" height="40" fill="#5c7391"/><rect x="300" y="190" width="30" height="40" fill="#5c7391"/><rect x="390" y="190" width="30" height="40" fill="#5c7391"/>
           <rect x="-40" y="230" width="540" height="8" fill="#5c7391"/>
         </g>
   <text x="400" y="513.6" fill="#ffffff" font-family="system-ui, sans-serif" font-size="27" font-weight="700" text-anchor="middle">PHOTO PLACEHOLDER</text>
-  <text x="400" y="551.4" fill="#c7d4e6" font-family="system-ui, sans-serif" font-size="22" text-anchor="middle">Triple-section on rural acreage</text>
-  <text x="400" y="581.1" fill="#8fa6c2" font-family="ui-monospace, monospace" font-size="16" text-anchor="middle">gallery-triple-wide-rural-acreage · 800×600</text>
+  <text x="400" y="551.4" fill="#efdfc5" font-family="system-ui, sans-serif" font-size="22" text-anchor="middle">Triple-section on rural acreage</text>
+  <text x="400" y="581.1" fill="#9fb0c6" font-family="ui-monospace, monospace" font-size="16" text-anchor="middle">gallery-triple-wide-rural-acreage · 800×600</text>
 </svg>
