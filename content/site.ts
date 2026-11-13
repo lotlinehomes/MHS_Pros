@@ -99,10 +99,10 @@ export const hero = {
   primaryCta: "Get My Setup Quote",
   secondaryCtaPrefix: "Call",
   image: {
-    src: "/placeholders/hero-crew-setting-home.svg", // PLACEHOLDER — wide shot of crew setting a home on piers
-    alt: "Setup crew leveling a multi-section manufactured home on a prepared site",
-    width: 1600,
-    height: 1100,
+    src: "/images/work/01-finished-charcoal-white-gravel-drive.webp",
+    alt: "Finished charcoal and white manufactured home with block skirting, wood entry steps and a new gravel driveway",
+    width: 1448,
+    height: 1086,
   } satisfies ImageRef,
   trust: {
     rating: 4.9, // PLACEHOLDER
@@ -253,21 +253,23 @@ export const processSteps = {
 // ---------------------------------------------------------------------------
 // Project gallery
 // ---------------------------------------------------------------------------
-// PLACEHOLDER — every photo below is a placeholder graphic. Swap `src` for real
-// job photos and keep captions honest.
+// Real job photos (Sept–Nov 2026), stored in /public/images/work.
 export const gallery = {
   eyebrow: "Recent work",
   heading: "Homes we've set.",
   items: [
-    { src: "/placeholders/gallery-doublewide-before-pad-prep.svg", alt: "Prepared pad and pier footings before a doublewide is delivered", caption: "Before: pad prepped for a doublewide", width: 800, height: 600 },
-    { src: "/placeholders/gallery-doublewide-after-set.svg", alt: "Finished doublewide set, skirted, with steps", caption: "After: doublewide set, skirted & stepped", width: 800, height: 600 },
-    { src: "/placeholders/gallery-marriage-line-sealed.svg", alt: "Close-up of a sealed marriage line on a multi-section home", caption: "Marriage line sealed & trimmed", width: 800, height: 600 },
-    { src: "/placeholders/gallery-piers-and-tie-downs.svg", alt: "Steel piers and tie-down straps under a manufactured home", caption: "Piers & tie-downs to spec", width: 800, height: 600 },
-    { src: "/placeholders/gallery-singlewide-community-lot.svg", alt: "Singlewide home set on a community lot", caption: "Singlewide in a land-lease community", width: 800, height: 600 },
-    { src: "/placeholders/gallery-skirting-and-deck.svg", alt: "New skirting and a wood deck on a manufactured home", caption: "Skirting & deck finish", width: 800, height: 600 },
-    { src: "/placeholders/gallery-triple-wide-rural-acreage.svg", alt: "Triple-section home set on rural acreage", caption: "Triple-section on acreage", width: 800, height: 600 },
-    { src: "/placeholders/gallery-laser-leveling-crew.svg", alt: "Crew member checking level with a laser on a home frame", caption: "Laser-level check", width: 800, height: 600 },
-    { src: "/placeholders/gallery-final-walkthrough.svg", alt: "Crew lead walking a homeowner through the finished home", caption: "Final walkthrough", width: 800, height: 600 },
+    { src: "/images/work/01-finished-charcoal-white-gravel-drive.webp", alt: "Finished charcoal and white manufactured home with block skirting, wood entry steps and a gravel driveway", caption: "Finished: skirted, stepped & gravel drive", width: 1448, height: 1086 },
+    { src: "/images/work/02-finished-blue-white-skirted-steps.webp", alt: "Blue and white manufactured home with block skirting and new wood steps on a cleared lot", caption: "Turnkey: set, skirted & stepped", width: 1448, height: 1086 },
+    { src: "/images/work/03-finished-sage-green-landscaped.webp", alt: "Sage green and white manufactured home with skirting, wood stairs, new shrubs and a gravel driveway", caption: "Turnkey finish with landscaping", width: 1448, height: 1086 },
+    { src: "/images/work/04-white-home-new-wood-steps.webp", alt: "White manufactured home with black shutters set on block piers with new pressure-treated steps", caption: "New wood steps & landing", width: 1448, height: 1086 },
+    { src: "/images/work/05-piers-and-tie-down-straps.webp", alt: "Stacked block piers and steel tie-down straps over a vapor barrier under a gray manufactured home", caption: "Piers & tie-down straps", width: 1448, height: 1086 },
+    { src: "/images/work/06-high-piers-sloped-lot.webp", alt: "Manufactured home set on tall block piers over a vapor barrier on a sloped wooded lot", caption: "High piers on a sloped lot", width: 1448, height: 1086 },
+    { src: "/images/work/07-block-piers-vapor-barrier.webp", alt: "Beige manufactured home on stacked block piers with a vapor barrier underneath", caption: "Block piers over vapor barrier", width: 1448, height: 1086 },
+    { src: "/images/work/08-charcoal-home-set-on-piers.webp", alt: "Charcoal manufactured home set and leveled on block piers on a cleared wooded lot", caption: "Set & leveled on block piers", width: 1448, height: 1086 },
+    { src: "/images/work/09-green-home-graded-lot.webp", alt: "Dark green and beige manufactured home set on a freshly graded lot", caption: "Set on a freshly graded lot", width: 1448, height: 1086 },
+    { src: "/images/work/10-white-home-newly-set.webp", alt: "White manufactured home with black shutters newly set on block piers", caption: "Just set, ready for finishing", width: 1448, height: 1086 },
+    { src: "/images/work/11-green-home-piers-going-in.webp", alt: "Light green manufactured home on block piers with vapor barrier going down", caption: "Piers & vapor barrier going in", width: 1448, height: 1086 },
+    { src: "/images/work/12-white-home-sandy-lot.webp", alt: "White manufactured home with black shutters set on piers on a sandy lot", caption: "Set on a sandy lot", width: 1448, height: 1086 },
   ],
 };
 
