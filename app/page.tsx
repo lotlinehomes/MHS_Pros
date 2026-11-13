@@ -1,4 +1,4 @@
-import { business, ctaBands, faq, seo, services, serviceArea } from "@/content/site";
+import { business, ctaBands, disclosure, faq, partner, seo, services, serviceArea } from "@/content/site";
 import { siteUrl } from "@/lib/site-url";
 import { CtaBand } from "@/components/ui";
 import { RevealObserver } from "@/components/RevealObserver";
@@ -9,6 +9,7 @@ import {
   Hero,
   LogoBar,
   MobileCtaBar,
+  Partnership,
   ProblemSolution,
   Process,
   QuoteSection,
@@ -27,18 +28,23 @@ function jsonLd() {
   const a = business.address;
   // NOTE: No aggregateRating/review markup on purpose — only add it once ratings are real
   // and shown on the page, or Google may penalize it.
+  const partnerId = `${url}/#fulfillment-partner`;
+  // Compliance: MHSP is described as the marketing / quoting / coordination business (generic LocalBusiness),
+  // NOT a construction or installation contractor. Every setup service names Shark Management Group, LLC
+  // (the licensed setup contractor) as its provider.
   const data = [
     {
       "@context": "https://schema.org",
-      "@type": "HomeAndConstructionBusiness",
+      "@type": "LocalBusiness",
       "@id": `${url}/#business`,
       name: business.name,
-      description: seo.description,
+      description: `${seo.description} ${disclosure}`,
+      slogan: business.roleLine,
       url,
       telephone: business.phoneHref.replace("tel:", ""),
       email: business.email,
-      image: `${url}/opengraph-image`,
-      logo: `${url}${business.logo.src}`,
+      image: `${url}/opengraph-image.jpg`,
+      logo: `${url}${business.logoFull.src}`,
       foundingDate: String(business.foundedYear),
       address: {
         "@type": "PostalAddress",
@@ -49,11 +55,25 @@ function jsonLd() {
         addressCountry: a.country,
       },
       areaServed: serviceArea.regions.map((r) => ({ "@type": "AdministrativeArea", name: r.name })),
+      knowsAbout: ["Manufactured home setup quotes", "Project coordination", "Customer onboarding"],
       hasOfferCatalog: {
         "@type": "OfferCatalog",
-        name: "Manufactured home setup services",
-        itemListElement: services.map((s) => ({ "@type": "Offer", itemOffered: { "@type": "Service", name: s.title, description: s.body } })),
+        name: "Manufactured home setup services (installed by Shark Management Group, LLC)",
+        itemListElement: services.map((s) => ({
+          "@type": "Offer",
+          offeredBy: { "@id": `${url}/#business` },
+          itemOffered: { "@type": "Service", name: s.title, description: s.body, provider: { "@id": partnerId } },
+        })),
       },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "HomeAndConstructionBusiness",
+      "@id": partnerId,
+      name: partner.name,
+      url: partner.url,
+      description: partner.role,
+      logo: `${url}${partner.logo.src}`,
     },
     {
       "@context": "https://schema.org",
@@ -83,8 +103,9 @@ export default function Home() {
         <StatsBand />
         <CtaBand {...ctaBands.afterStats} />
 
-        {/* 5–6: problem, then people vouching */}
+        {/* 5–6: problem, who does what, then people vouching */}
         <ProblemSolution />
+        <Partnership />
         <TestimonialsFeatured />
         <CtaBand {...ctaBands.afterTestimonials} />
 
