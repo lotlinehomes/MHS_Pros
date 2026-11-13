@@ -161,7 +161,11 @@ How it flows (`app/api/quote/route.ts` → `lib/lotstack.ts`):
 
 ### Setup
 
-Add `LOTSTACK_API_KEY` in Vercel (**mhs-pros → Settings → Environment Variables**), then redeploy. The key comes from LotStack and is sent as `Authorization: Bearer …`. Until it's set, requests are logged only. Never put the key in the code.
+Nothing to configure. The site sends straight to LotStack's public quote-request endpoint, and no key is needed. Good to know:
+
+- **Rate limits.** LotStack allows 6 requests per hour per IP and 5 per day per email. Website leads all come from Vercel's servers, so an unusually busy hour could hit the per-IP limit. Those show up in the logs as `LotStack send FAILED` with the full lead, so you can enter them by hand.
+- **Captcha.** If LotStack's Cloudflare captcha is ever switched on, website sends will start failing. Before enabling it, either have LotStack accept a server key (then set `LOTSTACK_API_KEY` in Vercel) or have the site show the captcha widget.
+- **Kill switch.** Set `LOTSTACK_DISABLED=1` in Vercel to stop sending; leads are then only logged.
 
 ### Prices
 Prices are edited in **LotStack → Set-Up → Pricebook**, not here. As of Nov 13, the default prices match the **high end** of the fulfillment partner's Nov 9 turnkey price list. The team adjusts each draft quote down after the site visit as needed.

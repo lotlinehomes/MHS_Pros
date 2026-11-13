@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { normalizeQuote, validateQuote } from "@/lib/quote";
-import { buildLotStackRequest, lotstackConfigured, sendToLotStack } from "@/lib/lotstack";
+import { buildLotStackRequest, lotstackEnabled, sendToLotStack } from "@/lib/lotstack";
 
 export const runtime = "nodejs";
 
@@ -11,7 +11,7 @@ export const runtime = "nodejs";
  * 2. Sends the request to LotStack (lib/lotstack.ts), which creates the customer, drafts a
  *    quote priced from the Mobile Home Setup Pros Pricebook, and emails the team.
  * 3. Always logs the lead too (Vercel → Project → Logs, search "[quote]"), so nothing is lost
- *    if LotStack is down or the API key isn't set yet.
+ *    if LotStack is down or rejects the request.
  *
  * Secrets come from env vars only (see .env.example). Never hardcode them.
  */
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
   // Always keep a copy in the logs (photos summarized, not dumped).
   console.log("[quote] new lead", JSON.stringify({ ...payload, photos: `${payload.photos.length} photo(s)` }));
 
-  if (lotstackConfigured()) {
+  if (lotstackEnabled()) {
     try {
       await sendToLotStack(payload);
       console.log("[quote] sent to LotStack:", payload.email);
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
       console.error("[quote] LotStack send FAILED — follow up manually:", err instanceof Error ? err.message : err);
     }
   } else {
-    console.warn("[quote] LOTSTACK_API_KEY not set — lead logged only, not sent to LotStack.");
+    console.warn("[quote] LOTSTACK_DISABLED=1 — lead logged only, not sent to LotStack.");
   }
 
   return NextResponse.json({ ok: true });

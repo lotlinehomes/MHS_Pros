@@ -10,15 +10,22 @@
  *   timeframe, preferredDate, services (Pricebook item IDs), needsHome, homeConsent,
  *   photos (data URLs), heardFrom, message (≤2000), source, website (honeypot, must be empty).
  *
- * Env vars (server-only):
- *   LOTSTACK_API_KEY   server key issued by LotStack (sent as "Authorization: Bearer …").
- *                      Requests are only sent when this is set.
+ * No key is needed today: the endpoint accepts server-to-server POSTs (verified Nov 13).
+ * Things to know:
+ *   - LotStack rate-limits 6 requests/hour per IP and 5/day per email. All website leads come
+ *     from Vercel's IPs, so very busy hours could hit the per-IP limit (logged as a FAILED send).
+ *   - If LotStack's Cloudflare captcha is ever switched on, server sends will start failing until
+ *     LotStack adds a server key or the site shows the captcha widget. Check the logs after enabling it.
+ *
+ * Env vars (server-only, all optional):
+ *   LOTSTACK_API_KEY   a server key, if LotStack ever adds one (sent as "Authorization: Bearer …").
  *   LOTSTACK_API_URL   defaults to https://lotstack.ai/api/setup/quote-requests
+ *   LOTSTACK_DISABLED  set to "1" to stop sending (leads are then logged only).
  */
 import type { QuoteInput } from "@/lib/quote";
 
 const API_URL = () => process.env.LOTSTACK_API_URL || "https://lotstack.ai/api/setup/quote-requests";
-export const lotstackConfigured = () => Boolean(process.env.LOTSTACK_API_KEY);
+export const lotstackEnabled = () => process.env.LOTSTACK_DISABLED !== "1";
 
 /** Mobile Home Setup Pros Pricebook item IDs in LotStack (setup_pricebook_items). */
 export const SERVICE_IDS = {
@@ -213,8 +220,6 @@ async function offeredServiceIds(): Promise<Set<string> | null> {
 
 /** POST the request to LotStack. Throws with LotStack's error message on failure. */
 export async function sendToLotStack(payload: LotStackPayload): Promise<void> {
-  if (!lotstackConfigured()) throw new Error("LOTSTACK_API_KEY is not set");
-
   const live = await offeredServiceIds();
   let body = payload;
   if (live) {
@@ -231,7 +236,10 @@ export async function sendToLotStack(payload: LotStackPayload): Promise<void> {
 
   const res = await fetch(API_URL(), {
     method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.LOTSTACK_API_KEY}` },
+    headers: {
+      "Content-Type": "application/json",
+      ...(process.env.LOTSTACK_API_KEY ? { Authorization: `Bearer ${process.env.LOTSTACK_API_KEY}` } : {}),
+    },
     body: JSON.stringify(body),
     signal: AbortSignal.timeout(15_000),
     cache: "no-store",
