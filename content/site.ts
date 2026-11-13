@@ -12,6 +12,12 @@
  *    /public/images (or /public/placeholders) and change the `src` here.
  *    Keep the `alt` text accurate to what the real photo shows.
  *  - Icons are picked by name from components/Icon.tsx.
+ *  - COMPLIANCE: Mobile Home Setup Pros (MHSP) is the marketing, quoting, and
+ *    customer-coordination front end. It does NOT hold an installer license and
+ *    does NOT perform installation. All licensed manufactured-home setup and
+ *    field work is performed by fulfillment partner Shark Management Group, LLC
+ *    (see `partner` below). Keep every word on the site consistent with that —
+ *    never write "we install / our crews set" as if MHSP does the work.
  *
  *  Search this file for "PLACEHOLDER" to find everything that still needs
  *  real content.
@@ -42,7 +48,8 @@ export const business = {
     country: "US",
   },
   hours: "Mon–Fri 7am–6pm · Sat by appointment", // PLACEHOLDER
-  licenseLine: "Licensed & insured · License # PLACEHOLDER", // PLACEHOLDER — real license number(s) go here
+  // MHSP does not hold an installer license. Licensing lives on `partner` below.
+  roleLine: "Marketing, quoting & project coordination",
   foundedYear: 2025, // PLACEHOLDER
   // Brand logo. The header uses a tighter crop (no tagline lines); the full lockup is used in the footer.
   logo: {
@@ -60,12 +67,78 @@ export const business = {
 };
 
 // ---------------------------------------------------------------------------
+// Fulfillment partner — the licensed setup contractor
+// ---------------------------------------------------------------------------
+export const partner = {
+  name: "Shark Management Group, LLC",
+  shortName: "Shark Management Group",
+  url: "https://sharkmanagementgroupllc.com/",
+  role: "Licensed manufactured-home setup contractor & fulfillment partner",
+  // PLACEHOLDER — Shark's actual state installer license number(s) and state(s). Do not publish until confirmed.
+  licenseLine: "Manufactured-home installer license # PLACEHOLDER (state PLACEHOLDER)",
+  // PLACEHOLDER — confirm Shark's general liability & workers' comp coverage before relying on this.
+  insuranceLine: "Certificates of insurance available on request.",
+  // Official vector logo supplied by Shark (transparent SVG).
+  // Full lockup (wordmark + "Licensed Setup Contractor") — used in the partnership section and footer.
+  logo: {
+    src: "/brand/shark-management-logo.svg",
+    alt: "Shark Management Group, LLC logo — Licensed Setup Contractor",
+    width: 1475,
+    height: 807,
+  } satisfies ImageRef,
+  // Circular shark-fin emblem only (same artwork, cropped viewBox) — used in the compact header lockup.
+  mark: {
+    src: "/brand/shark-management-mark.svg",
+    alt: "Shark Management Group, LLC",
+    width: 570,
+    height: 570,
+  } satisfies ImageRef,
+};
+
+/** Plain-English disclosure. Shown in the partnership section and the footer. */
+export const disclosure =
+  "Mobile Home Setup Pros is the marketing, quoting, and customer-coordination front end. All licensed manufactured-home installation work is performed by our fulfillment partner, Shark Management Group, LLC.";
+
+// ---------------------------------------------------------------------------
+// Partnership / operating model section
+// ---------------------------------------------------------------------------
+export const partnership = {
+  eyebrow: "Who does what",
+  heading: "Two companies. One accountable team.",
+  intro:
+    "You deal with one point of contact from your first quote to the final walkthrough. Behind that, each company does the part it's set up to do.",
+  mhsp: {
+    tag: "Front end · Your point of contact",
+    title: "Mobile Home Setup Pros",
+    body: "Our marketing, customer service, quoting, and onboarding team. We're who you talk to.",
+    points: [
+      "Handles your quote request and scopes the job",
+      "Coordinates site readiness before the home moves",
+      "Assigns a dedicated project coordinator as your single point of contact",
+      "Keeps schedule, paperwork, and updates moving",
+    ],
+  },
+  shark: {
+    tag: "Licensed setup contractor · Fulfillment partner",
+    title: "Shark Management Group, LLC",
+    body: "Our licensed manufactured-home setup contractor. Their licensed setup crews do the physical work in the field.",
+    points: [
+      "Physical installation and placement of the home",
+      "Blocking, leveling, piers, and anchoring / tie-downs",
+      "Marriage-line work on multi-section homes",
+      "All other on-site setup work",
+    ],
+    linkLabel: "Visit Shark Management Group",
+  },
+};
+
+// ---------------------------------------------------------------------------
 // SEO (title, description, Open Graph, JSON-LD all read from here)
 // ---------------------------------------------------------------------------
 export const seo = {
-  title: "Mobile Home Setup Pros | Manufactured & Mobile Home Installation",
+  title: "Mobile Home Setup Pros | Manufactured & Mobile Home Setup Quotes",
   description:
-    "40 years of combined experience setting manufactured and mobile homes. Blocking, leveling, anchoring, marriage lines, skirting, and inspection-ready installs for dealers, developers, investors, and homeowners. Get a setup quote.",
+    "Manufactured and mobile home setup quotes with a dedicated project coordinator, for dealers, developers, investors, and homeowners. Licensed installation (blocking, leveling, anchoring, marriage lines) is performed by fulfillment partner Shark Management Group, LLC.",
   // The official site address. Used for the canonical URL, share previews, sitemap, and Google's business data.
   // (Setting the NEXT_PUBLIC_SITE_URL env var in Vercel overrides this.)
   siteUrl: "https://mobilehomesetuppros.com",
@@ -90,12 +163,13 @@ export const header = {
 // Hero
 // ---------------------------------------------------------------------------
 export const hero = {
-  eyebrow: "Site Prep ★ Installation ★ Finishing",
+  eyebrow: "Quoting ★ Coordination ★ Licensed Partner Installs",
   // Headline renders in two parts: bold slab line, then a red script line underneath.
-  headline: "40 years of setting homes.",
+  // PLACEHOLDER — confirm whose experience the "40 years" refers to (MHSP principals vs. Shark crews).
+  headline: "40 years of combined setup experience.",
   headlineAccent: "Level, anchored & inspection-ready.",
   subhead:
-    "Our crews have set single- and multi-section homes for dealers, developers, investors, and families. We show up when we say, set it right, and hand you a home that passes the first time.",
+    "One point of contact from quote to final walkthrough. We scope the job and coordinate your site — the setup itself is performed by the licensed crews of our fulfillment partner, Shark Management Group, LLC.",
   primaryCta: "Get My Setup Quote",
   secondaryCtaPrefix: "Call",
   image: {
@@ -108,11 +182,11 @@ export const hero = {
     rating: 4.9, // PLACEHOLDER
     ratingCount: "120+", // PLACEHOLDER
     ratingSource: "Google reviews", // PLACEHOLDER
-    licensedLabel: "Licensed & Insured",
-    licensedSub: "License # PLACEHOLDER", // PLACEHOLDER
-    yearsLabel: "40 yrs combined experience",
-    yearsSub: "Veteran setup crews",
-    homesLabel: "1,500+ homes set", // PLACEHOLDER
+    licensedLabel: "Licensed partner installs",
+    licensedSub: "By Shark Management Group, LLC · Lic. # PLACEHOLDER", // PLACEHOLDER — Shark's license #
+    yearsLabel: "40 yrs combined experience", // PLACEHOLDER — confirm attribution
+    yearsSub: "Industry veterans",
+    homesLabel: "1,500+ homes set", // PLACEHOLDER — confirm number and attribution
     homesSub: "Single & multi-section",
   },
 };
@@ -150,7 +224,7 @@ export const problemSolution = {
   eyebrow: "Why setup matters",
   heading: "A bad setup costs more than a good one.",
   intro:
-    "The home is only as good as what it sits on. Most problems we get called to fix trace back to a rushed or sloppy set.",
+    "The home is only as good as what it sits on. Most setup problems trace back to a rushed or sloppy set.",
   problems: [
     { title: "Failed inspections", body: "Wrong pier spacing, missing anchors, or no paperwork means a re-inspection and another week of waiting." },
     { title: "Delays that stack up", body: "A crew that no-shows or runs out of material pushes back utilities, trim-out, and your closing date." },
@@ -158,10 +232,10 @@ export const problemSolution = {
   ],
   solutionsHeading: "How we prevent it",
   solutions: [
-    "We set to the manufacturer's installation manual and your local code — every pier, every anchor.",
-    "Site check before the home moves, so the pad, access, and materials are ready on day one.",
-    "Laser-level blocking, then a re-check after the marriage line is sealed.",
-    "Photo documentation and a punch list at walkthrough, so the inspector sees what we did.",
+    "Every set is performed by Shark Management Group's licensed crews to the manufacturer's installation manual and your local code — every pier, every anchor.",
+    "We coordinate a site-readiness check before the home moves, so the pad, access, and materials are ready on day one.",
+    "Laser-level blocking by the licensed setup crew, then a re-check after the marriage line is sealed.",
+    "Your project coordinator delivers photo documentation and runs the punch list at walkthrough, so the inspector sees the work.",
   ],
 };
 
@@ -179,6 +253,13 @@ export type Testimonial = {
 
 // PLACEHOLDER — ALL testimonials below are invented examples. Replace with real
 // customer quotes (with their permission) before launch.
+export const testimonialsSection = {
+  featuredEyebrow: "What customers say",
+  featuredHeading: "Dealers, developers, and homeowners call us back.",
+  wallEyebrow: "More reviews",
+  wallHeading: "Job after job, the same story.",
+};
+
 export const testimonialsFeatured: Testimonial[] = [
   {
     quote:
@@ -224,12 +305,19 @@ export const testimonialsWall: Testimonial[] = [
 // ---------------------------------------------------------------------------
 // Services
 // ---------------------------------------------------------------------------
+export const servicesSection = {
+  eyebrow: "Services",
+  heading: "Everything it takes to set a home right.",
+  intro: "One point of contact from quote to trim-out. We scope and coordinate; the licensed work is performed by Shark Management Group, LLC.",
+  note: "Installation and on-site work listed above is performed by our licensed fulfillment partner, Shark Management Group, LLC. Mobile Home Setup Pros provides quoting, scheduling, and project coordination.",
+};
+
 export const services: { icon: IconName; title: string; body: string }[] = [
-  { icon: "home", title: "Single & multi-section setup", body: "Singlewides, doublewides, and triples set to the manufacturer's manual and local code." },
+  { icon: "home", title: "Single & multi-section setup", body: "Singlewides, doublewides, and triples set by licensed crews to the manufacturer's manual and local code." },
   { icon: "level", title: "Blocking & leveling", body: "Laser-leveled blocking with proper pier spacing so the home stays square for decades." },
   { icon: "anchor", title: "Piers, anchors & tie-downs", body: "Engineered piers, ground anchors, and straps rated for your soil and wind zone." },
   { icon: "link", title: "Marriage line", body: "Halves joined, fastened, and sealed — roof, floor, and walls — so it's tight and weatherproof." },
-  { icon: "plug", title: "Utility hookup coordination", body: "We line up and coordinate water, sewer, and electric connections with licensed trades." },
+  { icon: "plug", title: "Utility hookup coordination", body: "We line up and coordinate water, sewer, and electric connections with the appropriately licensed trades." },
   { icon: "skirting", title: "Skirting", body: "Vinyl, metal, or faux-stone skirting with ventilation, installed clean and straight." },
   { icon: "steps", title: "Steps & decks", body: "Code-compliant steps, landings, and decks so the home is ready to walk into." },
   { icon: "clipboard", title: "Trim-out & inspection-ready", body: "Interior and exterior trim-out, punch list, and documentation ready for the inspector." },
@@ -241,12 +329,13 @@ export const services: { icon: IconName; title: string; body: string }[] = [
 export const processSteps = {
   eyebrow: "How it works",
   heading: "From quote to keys in five steps.",
+  // `by` shows which company handles each step ("Shark crew" = Shark Management Group, LLC's licensed setup crew).
   steps: [
-    { title: "Request a quote", body: "Tell us about the home and the site. We reply within one business day." },
-    { title: "Site check", body: "We confirm the pad, access, and permits before the home ships." },
-    { title: "Set & level", body: "Home is placed, blocked, leveled, and anchored. Multi-sections are married and sealed." },
-    { title: "Finish work", body: "Skirting, steps, trim-out, and utility coordination wrapped up on schedule." },
-    { title: "Final walkthrough", body: "We walk it with you, close the punch list, and hand over photos for the inspector." },
+    { title: "Request a quote", by: "MHSP", body: "Tell us about the home and the site. We reply within one business day and assign your project coordinator." },
+    { title: "Site check", by: "MHSP", body: "Your coordinator confirms the pad, access, and permit requirements with you before the home ships." },
+    { title: "Set & level", by: "Shark crew", body: "The licensed setup crew places, blocks, levels, and anchors the home. Multi-sections are married and sealed." },
+    { title: "Finish work", by: "Shark crew", body: "Skirting, steps, and trim-out by the field crew, while your coordinator keeps utilities and the schedule on track." },
+    { title: "Final walkthrough", by: "MHSP + Shark", body: "Your coordinator and the crew lead walk it with you, close the punch list, and hand over photos for the inspector." },
   ],
 };
 
@@ -256,7 +345,8 @@ export const processSteps = {
 // Real job photos (Sept–Nov 2026), stored in /public/images/work.
 export const gallery = {
   eyebrow: "Recent work",
-  heading: "Homes we've set.",
+  heading: "Recent setups.",
+  intro: "Projects coordinated by Mobile Home Setup Pros and installed by the licensed crews of Shark Management Group, LLC.",
   items: [
     { src: "/images/work/01-finished-charcoal-white-gravel-drive.webp", alt: "Finished charcoal and white manufactured home with block skirting, wood entry steps and a gravel driveway", caption: "Finished: skirted, stepped & gravel drive", width: 1448, height: 1086 },
     { src: "/images/work/02-finished-blue-white-skirted-steps.webp", alt: "Blue and white manufactured home with block skirting and new wood steps on a cleared lot", caption: "Turnkey: set, skirted & stepped", width: 1448, height: 1086 },
@@ -297,15 +387,16 @@ export const guarantee = {
   eyebrow: "Our promise",
   heading: "We stand behind every set.",
   items: [
-    { icon: "shield", title: "Workmanship guarantee", body: "If something we installed isn't right, we come back and make it right. 1-year workmanship guarantee." }, // PLACEHOLDER — confirm real terms
-    { icon: "badge", title: "Licensed & insured", body: "Fully licensed installers with general liability and workers' comp. Certificates on request." }, // PLACEHOLDER — confirm coverage
-    { icon: "clipboard", title: "Inspection-ready promise", body: "We set to code and the manufacturer's manual. If we miss something on inspection, the fix is on us." }, // PLACEHOLDER — confirm real terms
+    { icon: "shield", title: "Workmanship guarantee", body: "If something in the installation isn't right, your coordinator gets the licensed crew back out to make it right. 1-year workmanship guarantee." }, // PLACEHOLDER — confirm real terms AND which company issues the warranty
+    { icon: "badge", title: "Licensed installation partner", body: "Every install is performed by Shark Management Group, LLC, our licensed manufactured-home setup contractor. License # PLACEHOLDER. Certificates of insurance on request." }, // PLACEHOLDER — Shark's license # and coverage
+    { icon: "clipboard", title: "Inspection-ready promise", body: "Every set follows code and the manufacturer's installation manual. If something is missed on inspection, we get it corrected at no cost to you." }, // PLACEHOLDER — confirm real terms and who carries the obligation
   ] satisfies { icon: IconName; title: string; body: string }[],
-  // PLACEHOLDER — certification badges are fake. Only show certifications you actually hold.
+  // PLACEHOLDER — certification badges are fake. Only show certifications actually held, and by whom
+  // (installer licenses/certifications belong to Shark Management Group, not MHSP).
   badges: [
-    { src: "/placeholders/badge-state-installer-license.svg", alt: "State installer license badge placeholder", width: 120, height: 120 },
+    { src: "/placeholders/badge-state-installer-license.svg", alt: "Placeholder for Shark Management Group's state installer license badge", width: 120, height: 120 },
     { src: "/placeholders/badge-industry-association-member.svg", alt: "Industry association membership badge placeholder", width: 120, height: 120 },
-    { src: "/placeholders/badge-manufacturer-certified-installer.svg", alt: "Manufacturer-certified installer badge placeholder", width: 120, height: 120 },
+    { src: "/placeholders/badge-manufacturer-certified-installer.svg", alt: "Placeholder for Shark Management Group's manufacturer-certified installer badge", width: 120, height: 120 },
     { src: "/placeholders/badge-bbb-accredited.svg", alt: "Business accreditation badge placeholder", width: 120, height: 120 },
   ] satisfies ImageRef[],
 };
@@ -315,7 +406,7 @@ export const guarantee = {
 // ---------------------------------------------------------------------------
 export const serviceArea = {
   eyebrow: "Service area",
-  heading: "Where we set homes.",
+  heading: "Where we work.",
   intro: "Based in Anytown, ST. We travel up to about 250 miles for multi-home projects. Not sure if you're in range? Ask.", // PLACEHOLDER
   // PLACEHOLDER — real states / regions go here.
   regions: [
@@ -343,12 +434,13 @@ export const faq = {
   items: [
     { q: "How much does a mobile home setup cost?", a: "It depends on the number of sections, site conditions, distance, and what's included (skirting, steps, trim-out). Most single-section setups and multi-section setups are quoted as a flat price after we know the home and the site. Send us the details and we'll give you a real number, not a range." }, // PLACEHOLDER — add real pricing guidance if you want
     { q: "How long does a setup take?", a: "A typical single-section set is done in 1–2 days. Multi-sections usually take 2–4 days depending on the marriage line, weather, and finish work. We'll give you a schedule with your quote." }, // PLACEHOLDER — confirm timelines
-    { q: "Do you handle permits and inspections?", a: "We set to code and the manufacturer's installation manual, and we'll coordinate with your inspector. Permit requirements vary by county — we'll tell you what's needed and can help pull them where allowed." },
+    { q: "Who actually installs my home?", a: "Shark Management Group, LLC, our licensed manufactured-home setup contractor and fulfillment partner. Their licensed crews do the physical installation, blocking, leveling, anchoring, marriage-line, and other on-site work. Mobile Home Setup Pros handles your quote, onboarding, and scheduling, and assigns a project coordinator who stays your single point of contact." },
+    { q: "Do you handle permits and inspections?", a: "Installations are performed by Shark Management Group's licensed crews to code and the manufacturer's installation manual, and your coordinator will work with your inspector. Permit requirements vary by county — we'll tell you what's needed and help line up permits with the licensed installer where allowed." },
     { q: "What's included in a standard setup?", a: "Placement, blocking and leveling, piers, anchors and tie-downs, and (for multi-sections) the marriage line. Skirting, steps/decks, trim-out, and utility coordination can be added — your quote spells out exactly what's in and what's not." },
-    { q: "Do you set multi-section homes?", a: "Yes — doublewides, triples, and larger. Joining and sealing the marriage line correctly is one of the most important parts of the job, and it's where experience shows." },
+    { q: "Can you handle multi-section homes?", a: "Yes — doublewides, triples, and larger. Shark Management Group's licensed crews join and seal the marriage line, one of the most important parts of the job and where experience shows." },
     { q: "How far will you travel?", a: "Our core area is listed above. We regularly travel farther for multi-home projects. If you're outside the area, ask — travel may be added to the quote." }, // PLACEHOLDER
     { q: "Do you work with dealers and developers on volume?", a: "Yes. We work with dealers, land developers, and investors on recurring and multi-lot projects, with scheduling built around your delivery dates." },
-    { q: "Can you fix a home someone else set?", a: "Often, yes. We do re-leveling, re-anchoring, and marriage-line repairs. Send photos with your quote request and we'll tell you what we see." },
+    { q: "Can you fix a home someone else set?", a: "Often, yes. Re-leveling, re-anchoring, and marriage-line repairs can be quoted through us and are performed by Shark Management Group's licensed crews. Send photos with your quote request and we'll tell you what we see." },
   ],
 };
 
@@ -386,7 +478,8 @@ export const quoteForm = {
 // Footer
 // ---------------------------------------------------------------------------
 export const footer = {
-  blurb: "Manufactured and mobile home setup for dealers, developers, investors, and homeowners. 40 years of combined experience.",
+  blurb: "Quoting, onboarding, and project coordination for manufactured and mobile home setups — for dealers, developers, investors, and homeowners.",
+  partnerHeading: "Licensed installation partner",
   // PLACEHOLDER — real links (privacy policy, terms, social) go here.
   links: [
     { label: "Privacy Policy", href: "#" },

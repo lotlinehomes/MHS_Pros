@@ -6,6 +6,15 @@ Built with **Next.js (App Router) + TypeScript + Tailwind CSS**. Runtime depende
 
 > ⚠️ **Everything marked `// PLACEHOLDER` in `content/site.ts` is fake.** That includes testimonials, names, ratings, stats, partner logos, badges, the phone number, email, license number, and service area. Replace each one with real, verifiable info or delete it before you rely on the site. Search the file for `PLACEHOLDER` to find them all.
 
+## Operating model & compliance (read before editing copy)
+
+The site is co-branded with **Shark Management Group, LLC**:
+
+- **Mobile Home Setup Pros (MHSP)** is the marketing, customer service, quoting, and onboarding front end. It handles quote requests, scoping, site-readiness coordination, and assigns a project coordinator.
+- **Shark Management Group, LLC** is the licensed manufactured-home setup contractor and fulfillment partner. Its licensed crews perform all physical installation and field work.
+
+**Rule:** MHSP must never claim to hold an installer license in its own name or to perform licensed installation itself. Don't write "we install", "our crews set", or "licensed & insured" about MHSP. Attribute licensing and field work to Shark Management Group, LLC. The partner details, licensing line, and the plain-English `disclosure` live in `content/site.ts` (`partner`, `partnership`, `disclosure`). The disclosure is shown in the "Who does what" section and in the footer.
+
 ---
 
 ## Run it locally
@@ -49,7 +58,9 @@ That one file controls everything on the page. You shouldn't need to touch any c
 
 | What you want to change                                  | Look for in `content/site.ts`             |
 | -------------------------------------------------------- | ----------------------------------------- |
-| Phone, email, hours, address, license line, logo         | `business`                                |
+| Phone, email, hours, address, logo                       | `business`                                |
+| Shark Management Group details, license line, logos      | `partner`                                 |
+| "Who does what" section + licensing disclosure           | `partnership`, `disclosure`               |
 | Page title, meta description, share text                 | `seo`                                     |
 | Hero headline, subhead, buttons, trust strip             | `hero`                                    |
 | "Trusted by" partner logos                               | `logoBar.logos`                           |
@@ -84,6 +95,8 @@ The look is matched to the logo: retro Americana, cream paper, navy, and brick r
 | -------------------------------------- | ----------------------------------------------------------------------------- |
 | `public/brand/mhs-pros-logo-header.webp` | Logo without the tagline lines, used in the sticky header                    |
 | `public/brand/mhs-pros-logo-full.webp`   | Full logo lockup with tagline, used in the footer                            |
+| `public/brand/shark-management-logo.svg` | Shark Management Group official vector logo ("Licensed Setup Contractor"), used in the partnership section and footer |
+| `public/brand/shark-management-mark.svg` | Same artwork cropped to the shark-fin emblem, used in the header lockup     |
 | `app/icon.png`, `app/apple-icon.png`     | Browser tab / home-screen icon (the crew guy's face)                         |
 | `app/opengraph-image.jpg`                | Image shown when the link is shared (1200×630). Alt text is in `opengraph-image.alt.txt` |
 
@@ -129,7 +142,7 @@ JPG/PNG/WebP photos are resized and converted to AVIF/WebP automatically by `nex
 
 ## SEO
 
-Title, description, Open Graph/Twitter tags, `HomeAndConstructionBusiness` JSON-LD, and `FAQPage` JSON-LD are all generated from `content/site.ts`. Rating/review markup is left out on purpose. Add it only once the ratings on the page are real.
+Title, description, Open Graph/Twitter tags, and JSON-LD are all generated from `content/site.ts`. The JSON-LD describes MHSP as a general `LocalBusiness` (not a contractor), lists Shark Management Group, LLC as a `HomeAndConstructionBusiness`, and names Shark as the `provider` of every setup service. It also includes `FAQPage` markup. Rating/review markup is left out on purpose. Add it only once the ratings on the page are real.
 
 ## Project layout
 
