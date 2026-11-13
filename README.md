@@ -8,12 +8,12 @@ Built with **Next.js (App Router) + TypeScript + Tailwind CSS**. Runtime depende
 
 ## Operating model & compliance (read before editing copy)
 
-The site is co-branded with **Shark Management Group, LLC**:
+- **Mobile Home Setup Pros (MHSP)** handles all the front end: marketing, customer support, quoting, and onboarding. It handles quote requests, scoping, site-readiness coordination, and assigns a project coordinator.
+- **Our fulfillment partner** is a licensed manufactured-home setup contractor. Its licensed crews perform all physical installation and field work. The partner is not named on the site.
 
-- **Mobile Home Setup Pros (MHSP)** is the marketing, customer service, quoting, and onboarding front end. It handles quote requests, scoping, site-readiness coordination, and assigns a project coordinator.
-- **Shark Management Group, LLC** is the licensed manufactured-home setup contractor and fulfillment partner. Its licensed crews perform all physical installation and field work.
+**Rule:** MHSP must never claim to hold an installer license in its own name or to perform licensed installation itself. Don't write "we install", "our crews set", or "licensed & insured" about MHSP. Attribute licensing and field work to "our licensed fulfillment partner". The plain-English `disclosure` and the `fulfillment.licenseLine` live in `content/site.ts` and are shown in the footer.
 
-**Rule:** MHSP must never claim to hold an installer license in its own name or to perform licensed installation itself. Don't write "we install", "our crews set", or "licensed & insured" about MHSP. Attribute licensing and field work to Shark Management Group, LLC. The partner details, licensing line, and the plain-English `disclosure` live in `content/site.ts` (`partner`, `partnership`, `disclosure`). The disclosure is shown in the "Who does what" section and in the footer.
+> ⚖️ Have counsel confirm whether your state(s) require ads for installation work to name the licensed contractor and show its license number. If they do, add it to `fulfillment.licenseLine`.
 
 ---
 
@@ -59,8 +59,9 @@ That one file controls everything on the page. You shouldn't need to touch any c
 | What you want to change                                  | Look for in `content/site.ts`             |
 | -------------------------------------------------------- | ----------------------------------------- |
 | Phone, email, hours, address, logo                       | `business`                                |
-| Shark Management Group details, license line, logos      | `partner`                                 |
-| "Who does what" section + licensing disclosure           | `partnership`, `disclosure`               |
+| Licensing disclosure (footer)                            | `disclosure`, `fulfillment`               |
+| Quote form questions, answer choices, service checkboxes | `quoteForm`                               |
+| Prices                                                   | **LotStack** Pricebook (not this repo)    |
 | Page title, meta description, share text                 | `seo`                                     |
 | Hero headline, subhead, buttons, trust strip             | `hero`                                    |
 | "Trusted by" partner logos                               | `logoBar.logos`                           |
@@ -95,8 +96,6 @@ The look is matched to the logo: retro Americana, cream paper, navy, and brick r
 | -------------------------------------- | ----------------------------------------------------------------------------- |
 | `public/brand/mhs-pros-logo-header.webp` | Logo without the tagline lines, used in the sticky header                    |
 | `public/brand/mhs-pros-logo-full.webp`   | Full logo lockup with tagline, used in the footer                            |
-| `public/brand/shark-management-logo.svg` | Shark Management Group official vector logo ("Licensed Setup Contractor"), used in the partnership section and footer |
-| `public/brand/shark-management-mark.svg` | Same artwork cropped to the shark-fin emblem, used in the header lockup     |
 | `app/icon.png`, `app/apple-icon.png`     | Browser tab / home-screen icon (the crew guy's face)                         |
 | `app/opengraph-image.jpg`                | Image shown when the link is shared (1200×630). Alt text is in `opengraph-image.alt.txt` |
 
@@ -132,17 +131,51 @@ JPG/PNG/WebP photos are resized and converted to AVIF/WebP automatically by `nex
 
 ---
 
-## The quote form
+## The quote form → LotStack
 
-- Client-side validation and server-side validation share the same rules (`lib/quote.ts`).
-- The form posts to **`app/api/quote/route.ts`**. Right now it validates the lead, logs it (Vercel → Project → Logs, search for `[quote] new lead`), and returns success.
-- A hidden honeypot field silently drops basic spam bots.
-- **TODOs in `route.ts`:** forward each lead to email and to the LotStack CRM API. All credentials come from environment variables; see `.env.example` for the names (`QUOTE_NOTIFY_EMAIL`, `EMAIL_PROVIDER_API_KEY`, `LOTSTACK_API_URL`, `LOTSTACK_API_KEY`). Never commit secrets.
-- Have the texting-consent wording (`quoteForm.smsConsentLabel`) reviewed for your SMS provider and TCPA requirements before you send texts.
+**LotStack is the system of record.** Each website request goes to LotStack's set-up quote API. LotStack then:
+- creates the customer;
+- drafts a quote priced from the **Mobile Home Setup Pros Pricebook**;
+- emails the team.
+
+From there the team reviews and sends the quote, and the customer signs, books and pays, all in LotStack. **The website never prices anything,** and customers don't see prices until the team sends the quote.
+
+What the form asks (all choices live in `quoteForm` in `content/site.ts`):
+
+1. **About you:** name, phone, email, customer type, and company (shown for businesses).
+2. **Property:** street (optional), city, state (dropdown), ZIP, county, parcel ID.
+3. **The home:** width, number of homes, size, manufacturer, delivery date, where it is now, and whether they still need to buy a home. If they say yes, there's an OK-to-share checkbox for CostPlus Home Co.
+4. **Site & foundation:** pad and foundation (required), plus optional site questions: cleared/level, truck access, power, water, sewer, permit started.
+5. **Services:** skirting (none, vinyl, brick or block), plus checkboxes that map to Pricebook items. Deck and demolition ask for square footage.
+6. **Timing & details:** target date, how they heard about us, up to 6 photos, notes, and texting consent.
+
+How it flows (`app/api/quote/route.ts` → `lib/lotstack.ts`):
+
+- **Validation.** The browser and server share the same rules (`lib/quote.ts`), with limits that mirror LotStack's own validator. A hidden honeypot drops basic spam bots.
+- **Mapping.** Each answer maps to a LotStack Pricebook item ID (`SERVICE_IDS` in `lib/lotstack.ts`). Width-specific items are chosen by home width (single- vs. double-wide set-up, trim and vinyl skirting).
+  - A triple-wide or "not sure" width sends a "price manually" note instead.
+  - Anything LotStack has no field for goes into the request's `message`: county, site conditions, sizes, square footage, and so on.
+- **Live check.** Before sending, the live LotStack service list is checked, so a retired Pricebook item can never make the whole request fail.
+- **Photos.** They're shrunk in the browser to stay within LotStack's limits (6 photos, 1 MB each, 3 MB total).
+- **Logs.** Every request is also logged (Vercel → Project → Logs, search `[quote]`). Search `LotStack send FAILED` to find any that need manual follow-up.
+
+### Setup
+
+Nothing to configure. The site sends straight to LotStack's public quote-request endpoint, and no key is needed. Good to know:
+
+- **Rate limits.** LotStack allows 6 requests per hour per IP and 5 per day per email. Website leads all come from Vercel's servers, so an unusually busy hour could hit the per-IP limit. Those show up in the logs as `LotStack send FAILED` with the full lead, so you can enter them by hand.
+- **Captcha.** If LotStack's Cloudflare captcha is ever switched on, website sends will start failing. Before enabling it, either have LotStack accept a server key (then set `LOTSTACK_API_KEY` in Vercel) or have the site show the captcha widget.
+- **Kill switch.** Set `LOTSTACK_DISABLED=1` in Vercel to stop sending; leads are then only logged.
+
+### Prices
+Prices are edited in **LotStack → Set-Up → Pricebook**, not here. As of Nov 13, the default prices match the **high end** of the fulfillment partner's Nov 9 turnkey price list. The team adjusts each draft quote down after the site visit as needed.
+
+### Still to do
+- Have the texting-consent wording (`quoteForm.smsConsentLabel`) reviewed for your SMS provider and TCPA before sending texts.
 
 ## SEO
 
-Title, description, Open Graph/Twitter tags, and JSON-LD are all generated from `content/site.ts`. The JSON-LD describes MHSP as a general `LocalBusiness` (not a contractor), lists Shark Management Group, LLC as a `HomeAndConstructionBusiness`, and names Shark as the `provider` of every setup service. It also includes `FAQPage` markup. Rating/review markup is left out on purpose. Add it only once the ratings on the page are real.
+Title, description, Open Graph/Twitter tags, and JSON-LD are all generated from `content/site.ts`. The JSON-LD describes MHSP as a general `LocalBusiness` (not a contractor), with the licensing disclosure in its description. It also includes `FAQPage` markup. Rating/review markup is left out on purpose. Add it only once the ratings on the page are real.
 
 ## Project layout
 
@@ -162,6 +195,8 @@ components/
   Icon.tsx                inline SVG icons + star rating
 content/site.ts           ← ALL content lives here
 lib/quote.ts              shared form validation
+lib/lotstack.ts           maps form answers → LotStack quote-request API
+lib/us-states.ts          state dropdown list
 public/brand/             real logo files
 public/placeholders/      placeholder images to replace
 ```

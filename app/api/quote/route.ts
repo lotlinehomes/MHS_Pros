@@ -1,15 +1,19 @@
 import { NextResponse } from "next/server";
 import { normalizeQuote, validateQuote } from "@/lib/quote";
+import { buildLotStackRequest, lotstackEnabled, sendToLotStack } from "@/lib/lotstack";
 
 export const runtime = "nodejs";
 
 /**
  * POST /api/quote — receives the quote form.
  *
- * Today: validates and logs the lead (visible in Vercel → Project → Logs), returns success.
+ * 1. Validates the answers (same rules as the browser form, see lib/quote.ts).
+ * 2. Sends the request to LotStack (lib/lotstack.ts), which creates the customer, drafts a
+ *    quote priced from the Mobile Home Setup Pros Pricebook, and emails the team.
+ * 3. Always logs the lead too (Vercel → Project → Logs, search "[quote]"), so nothing is lost
+ *    if LotStack is down or rejects the request.
  *
- * Secrets are read from env vars ONLY (set them in Vercel → Settings → Environment Variables,
- * and in .env.local for local dev). See .env.example for the full list.
+ * Secrets come from env vars only (see .env.example). Never hardcode them.
  */
 export async function POST(req: Request) {
   let raw: unknown;
@@ -31,33 +35,22 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, errors }, { status: 422 });
   }
 
-  const lead = {
-    receivedAt: new Date().toISOString(),
-    source: "website-quote-form",
-    name: quote.name,
-    phone: quote.phone,
-    email: quote.email,
-    homeType: quote.homeType,
-    homeCount: Number(quote.homeCount),
-    property: { city: quote.city, state: quote.state, zip: quote.zip },
-    targetDate: quote.targetDate || null,
-    notes: quote.notes || null,
-    smsConsent: quote.smsConsent,
-    smsConsentAt: quote.smsConsent ? new Date().toISOString() : null,
-  };
+  const payload = buildLotStackRequest(quote);
 
-  console.log("[quote] new lead", JSON.stringify(lead));
+  // Always keep a copy in the logs (photos summarized, not dumped).
+  console.log("[quote] new lead", JSON.stringify({ ...payload, photos: `${payload.photos.length} photo(s)` }));
 
-  // TODO(email): Send a notification email for each lead.
-  //   - Read the recipient from process.env.QUOTE_NOTIFY_EMAIL
-  //   - Read the provider key from process.env.EMAIL_PROVIDER_API_KEY (e.g. Resend, Postmark, SendGrid)
-  //   - Skip silently if either is missing so local dev keeps working.
-
-  // TODO(lotstack): Forward the lead to the LotStack CRM API.
-  //   - Base URL: process.env.LOTSTACK_API_URL
-  //   - Auth:     process.env.LOTSTACK_API_KEY (send as a header; NEVER hardcode or expose to the browser)
-  //   - Map `lead` above to LotStack's contact/lead payload, and decide whether a CRM failure
-  //     should still return success to the visitor (recommended: yes, but log + alert).
+  if (lotstackEnabled()) {
+    try {
+      await sendToLotStack(payload);
+      console.log("[quote] sent to LotStack:", payload.email);
+    } catch (err) {
+      // Don't fail the visitor's submission — the lead is in the logs above.
+      console.error("[quote] LotStack send FAILED — follow up manually:", err instanceof Error ? err.message : err);
+    }
+  } else {
+    console.warn("[quote] LOTSTACK_DISABLED=1 — lead logged only, not sent to LotStack.");
+  }
 
   return NextResponse.json({ ok: true });
 }

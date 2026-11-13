@@ -1,4 +1,4 @@
-import { business, ctaBands, disclosure, faq, partner, seo, services, serviceArea } from "@/content/site";
+import { business, ctaBands, disclosure, faq, seo, services, serviceArea } from "@/content/site";
 import { siteUrl } from "@/lib/site-url";
 import { CtaBand } from "@/components/ui";
 import { RevealObserver } from "@/components/RevealObserver";
@@ -9,7 +9,6 @@ import {
   Hero,
   LogoBar,
   MobileCtaBar,
-  Partnership,
   ProblemSolution,
   Process,
   QuoteSection,
@@ -28,10 +27,9 @@ function jsonLd() {
   const a = business.address;
   // NOTE: No aggregateRating/review markup on purpose — only add it once ratings are real
   // and shown on the page, or Google may penalize it.
-  const partnerId = `${url}/#fulfillment-partner`;
-  // Compliance: MHSP is described as the marketing / quoting / coordination business (generic LocalBusiness),
-  // NOT a construction or installation contractor. Every setup service names Shark Management Group, LLC
-  // (the licensed setup contractor) as its provider.
+  // Compliance: MHSP is described as the marketing / quoting / customer-support business (generic
+  // LocalBusiness), NOT a construction or installation contractor. Services are offered (sold) by MHSP;
+  // the disclosure in the description states that a licensed partner performs the installation.
   const data = [
     {
       "@context": "https://schema.org",
@@ -58,22 +56,13 @@ function jsonLd() {
       knowsAbout: ["Manufactured home setup quotes", "Project coordination", "Customer onboarding"],
       hasOfferCatalog: {
         "@type": "OfferCatalog",
-        name: "Manufactured home setup services (installed by Shark Management Group, LLC)",
+        name: "Manufactured home setup services (installed by our licensed fulfillment partner)",
         itemListElement: services.map((s) => ({
           "@type": "Offer",
           offeredBy: { "@id": `${url}/#business` },
-          itemOffered: { "@type": "Service", name: s.title, description: s.body, provider: { "@id": partnerId } },
+          itemOffered: { "@type": "Service", name: s.title, description: s.body },
         })),
       },
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "HomeAndConstructionBusiness",
-      "@id": partnerId,
-      name: partner.name,
-      url: partner.url,
-      description: partner.role,
-      logo: `${url}${partner.logo.src}`,
     },
     {
       "@context": "https://schema.org",
@@ -103,9 +92,8 @@ export default function Home() {
         <StatsBand />
         <CtaBand {...ctaBands.afterStats} />
 
-        {/* 5–6: problem, who does what, then people vouching */}
+        {/* 5–6: problem, then people vouching */}
         <ProblemSolution />
-        <Partnership />
         <TestimonialsFeatured />
         <CtaBand {...ctaBands.afterTestimonials} />
 
