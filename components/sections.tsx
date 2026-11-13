@@ -3,14 +3,13 @@ import {
   business,
   disclosure,
   faq,
+  fulfillment,
   footer,
   gallery,
   guarantee,
   header,
   hero,
   logoBar,
-  partner,
-  partnership,
   problemSolution,
   processSteps,
   quoteForm,
@@ -36,38 +35,21 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b-4 border-navy-900 bg-cream-50/95 backdrop-blur supports-[backdrop-filter]:bg-cream-50/90">
       <div className="h-1.5 bg-brick" aria-hidden="true" />
       <Container className="flex h-20 items-center justify-between gap-3">
-        {/* Co-brand lockup: MHSP × Shark Management Group */}
-        <a
-          href="#top"
-          className="flex shrink-0 items-center gap-1.5 sm:gap-2.5"
-          aria-label={`${business.name} in partnership with ${partner.name} — back to top`}
-        >
+        <a href="#top" className="shrink-0" aria-label={`${business.name} — back to top`}>
           <Image
             src={business.logo.src}
-            alt=""
+            alt={business.logo.alt}
             width={business.logo.width}
             height={business.logo.height}
             priority
-            sizes="(min-width: 640px) 101px, 76px"
-            className="h-12 w-auto sm:h-16"
-          />
-          <span aria-hidden="true" className="font-display text-xl font-black italic leading-none text-brick sm:text-2xl">
-            ×
-          </span>
-          <Image
-            src={partner.mark.src}
-            alt=""
-            width={partner.mark.width}
-            height={partner.mark.height}
-            priority
-            sizes="(min-width: 640px) 56px, 40px"
-            className="h-10 w-10 sm:h-14 sm:w-14"
+            sizes="(min-width: 640px) 101px, 88px"
+            className="h-14 w-auto sm:h-16"
           />
         </a>
         <div className="flex items-center gap-2 sm:gap-5">
           <a
             href={business.phoneHref}
-            className="hidden min-h-11 items-center gap-2 rounded-lg px-2 font-display text-lg font-extrabold text-navy-900 hover:text-brick min-[370px]:inline-flex"
+            className="hidden min-h-11 items-center gap-2 rounded-lg px-2 font-display text-lg font-extrabold text-navy-900 hover:text-brick min-[340px]:inline-flex"
             aria-label={`Call ${business.phoneDisplay}`}
           >
             <Icon name="phone" className="h-5 w-5" />
@@ -266,91 +248,6 @@ function TestimonialCard({ t, compact = false }: { t: Testimonial; compact?: boo
         </div>
       </figcaption>
     </figure>
-  );
-}
-
-/* ------------------------------------------------- Partnership / who does what */
-function PartnerCard({
-  logo,
-  tag,
-  title,
-  body,
-  points,
-  link,
-}: {
-  logo: { src: string; alt: string; width: number; height: number };
-  tag: string;
-  title: string;
-  body: string;
-  points: string[];
-  link?: { href: string; label: string };
-}) {
-  return (
-    <article className={`flex h-full flex-col p-6 sm:p-8 ${card} shadow-retro`} data-reveal>
-      <div className="flex h-36 items-center justify-center rounded-lg border-2 border-dashed border-navy-900/15 bg-white/60 p-3 sm:h-40">
-        <Image src={logo.src} alt={logo.alt} width={logo.width} height={logo.height} sizes="(min-width: 640px) 300px, 260px" className="h-full w-auto object-contain" />
-      </div>
-      <p className="mt-6 font-display text-xs font-extrabold uppercase italic tracking-[0.12em] text-brick">{tag}</p>
-      <h3 className="mt-1 font-display text-2xl font-extrabold text-navy-900">{title}</h3>
-      <p className="mt-2 text-ink">{body}</p>
-      <ul className="mt-5 space-y-3">
-        {points.map((pt) => (
-          <li key={pt} className="flex gap-3">
-            <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border-2 border-navy-900 bg-brick text-cream-50">
-              <Icon name="check" className="h-3.5 w-3.5" />
-            </span>
-            <span className="text-navy-900">{pt}</span>
-          </li>
-        ))}
-      </ul>
-      {link && (
-        <a
-          href={link.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-auto inline-flex items-center gap-2 self-start pt-6 font-display font-extrabold italic text-navy-900 underline decoration-brick decoration-2 underline-offset-4 hover:text-brick"
-        >
-          {link.label}
-          <Icon name="arrow" className="h-4 w-4" />
-          <span className="sr-only">(opens in a new tab)</span>
-        </a>
-      )}
-    </article>
-  );
-}
-
-export function Partnership() {
-  const p = partnership;
-  return (
-    <Section id="partners" labelledBy="partners-heading">
-      <SectionHeading id="partners-heading" eyebrow={p.eyebrow} heading={p.heading} intro={p.intro} />
-      <div className="grid items-stretch gap-6 lg:grid-cols-[1fr_auto_1fr] lg:gap-0">
-        <PartnerCard logo={business.logo} tag={p.mhsp.tag} title={p.mhsp.title} body={p.mhsp.body} points={p.mhsp.points} />
-        <div className="flex items-center justify-center lg:px-6" aria-hidden="true">
-          <span className="grid h-14 w-14 place-items-center rounded-full border-2 border-navy-900 bg-brick font-display text-3xl font-black italic leading-none text-cream-50 shadow-retro-sm">
-            ×
-          </span>
-        </div>
-        <PartnerCard
-          logo={partner.logo}
-          tag={p.shark.tag}
-          title={p.shark.title}
-          body={p.shark.body}
-          points={p.shark.points}
-          link={{ href: partner.url, label: p.shark.linkLabel }}
-        />
-      </div>
-      <div className="mt-10 flex gap-4 rounded-xl border-2 border-dashed border-navy-900/40 bg-cream-200/60 p-5 sm:p-6" data-reveal>
-        <Icon name="badge" className="mt-0.5 h-6 w-6 shrink-0 text-brick" />
-        <div>
-          <p className="font-display font-extrabold text-navy-900">Licensing disclosure</p>
-          <p className="mt-1 text-ink">{disclosure}</p>
-          <p className="mt-2 text-sm text-ink">
-            {partner.name} — {partner.licenseLine}. {partner.insuranceLine}
-          </p>
-        </div>
-      </div>
-    </Section>
   );
 }
 
@@ -670,26 +567,14 @@ export function SiteFooter() {
             </nav>
           </div>
         </div>
-        {/* Licensed installation partner + disclosure */}
-        <div className="mt-12 flex flex-col gap-5 border-t border-cream/15 pt-8 sm:flex-row sm:items-center">
-          <a
-            href={partner.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block shrink-0 self-start rounded-xl border-2 border-cream-50 bg-white p-2 sm:self-center"
-          >
-            <Image src={partner.logo.src} alt={`${partner.logo.alt} (opens in a new tab)`} width={partner.logo.width} height={partner.logo.height} sizes="180px" className="h-auto w-40" />
-          </a>
-          <div className="text-sm">
-            <h2 className="font-display text-sm font-extrabold uppercase italic tracking-wider text-cream-50">{footer.partnerHeading}</h2>
-            <p className="mt-2">
-              {partner.name} — {partner.licenseLine}.
-            </p>
-            <p className="mt-2 max-w-3xl leading-relaxed">{disclosure}</p>
-          </div>
+        {/* Licensing disclosure */}
+        <div className="mt-12 border-t border-cream/15 pt-8 text-sm">
+          <h2 className="font-display text-sm font-extrabold uppercase italic tracking-wider text-cream-50">Licensing</h2>
+          <p className="mt-2 max-w-3xl leading-relaxed">{disclosure}</p>
+          <p className="mt-2 max-w-3xl leading-relaxed">{fulfillment.licenseLine}</p>
         </div>
         <p className="mt-8 border-t border-cream/15 pt-6 text-xs">
-          © {year} {business.name}. All rights reserved. {partner.name} is an independent licensed contractor.
+          © {year} {business.name}. All rights reserved.
         </p>
       </Container>
     </footer>

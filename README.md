@@ -8,12 +8,12 @@ Built with **Next.js (App Router) + TypeScript + Tailwind CSS**. Runtime depende
 
 ## Operating model & compliance (read before editing copy)
 
-The site is co-branded with **Shark Management Group, LLC**:
+- **Mobile Home Setup Pros (MHSP)** handles all the front end: marketing, customer support, quoting, and onboarding. It handles quote requests, scoping, site-readiness coordination, and assigns a project coordinator.
+- **Our fulfillment partner** is a licensed manufactured-home setup contractor. Its licensed crews perform all physical installation and field work. The partner is not named on the site.
 
-- **Mobile Home Setup Pros (MHSP)** is the marketing, customer service, quoting, and onboarding front end. It handles quote requests, scoping, site-readiness coordination, and assigns a project coordinator.
-- **Shark Management Group, LLC** is the licensed manufactured-home setup contractor and fulfillment partner. Its licensed crews perform all physical installation and field work.
+**Rule:** MHSP must never claim to hold an installer license in its own name or to perform licensed installation itself. Don't write "we install", "our crews set", or "licensed & insured" about MHSP. Attribute licensing and field work to "our licensed fulfillment partner". The plain-English `disclosure` and the `fulfillment.licenseLine` live in `content/site.ts` and are shown in the footer.
 
-**Rule:** MHSP must never claim to hold an installer license in its own name or to perform licensed installation itself. Don't write "we install", "our crews set", or "licensed & insured" about MHSP. Attribute licensing and field work to Shark Management Group, LLC. The partner details, licensing line, and the plain-English `disclosure` live in `content/site.ts` (`partner`, `partnership`, `disclosure`). The disclosure is shown in the "Who does what" section and in the footer.
+> ⚖️ Have counsel confirm whether your state(s) require ads for installation work to name the licensed contractor and show its license number. If they do, add it to `fulfillment.licenseLine`.
 
 ---
 
@@ -59,8 +59,9 @@ That one file controls everything on the page. You shouldn't need to touch any c
 | What you want to change                                  | Look for in `content/site.ts`             |
 | -------------------------------------------------------- | ----------------------------------------- |
 | Phone, email, hours, address, logo                       | `business`                                |
-| Shark Management Group details, license line, logos      | `partner`                                 |
-| "Who does what" section + licensing disclosure           | `partnership`, `disclosure`               |
+| Licensing disclosure (footer)                            | `disclosure`, `fulfillment`               |
+| Quote form questions, answer choices, service checkboxes | `quoteForm`                               |
+| Prices used for the instant estimate                     | `lib/pricing.ts` (not `content/site.ts`)  |
 | Page title, meta description, share text                 | `seo`                                     |
 | Hero headline, subhead, buttons, trust strip             | `hero`                                    |
 | "Trusted by" partner logos                               | `logoBar.logos`                           |
@@ -95,8 +96,6 @@ The look is matched to the logo: retro Americana, cream paper, navy, and brick r
 | -------------------------------------- | ----------------------------------------------------------------------------- |
 | `public/brand/mhs-pros-logo-header.webp` | Logo without the tagline lines, used in the sticky header                    |
 | `public/brand/mhs-pros-logo-full.webp`   | Full logo lockup with tagline, used in the footer                            |
-| `public/brand/shark-management-logo.svg` | Shark Management Group official vector logo ("Licensed Setup Contractor"), used in the partnership section and footer |
-| `public/brand/shark-management-mark.svg` | Same artwork cropped to the shark-fin emblem, used in the header lockup     |
 | `app/icon.png`, `app/apple-icon.png`     | Browser tab / home-screen icon (the crew guy's face)                         |
 | `app/opengraph-image.jpg`                | Image shown when the link is shared (1200×630). Alt text is in `opengraph-image.alt.txt` |
 
@@ -132,17 +131,44 @@ JPG/PNG/WebP photos are resized and converted to AVIF/WebP automatically by `nex
 
 ---
 
-## The quote form
+## The quote form → instant estimate → Smartsheet
 
-- Client-side validation and server-side validation share the same rules (`lib/quote.ts`).
-- The form posts to **`app/api/quote/route.ts`**. Right now it validates the lead, logs it (Vercel → Project → Logs, search for `[quote] new lead`), and returns success.
-- A hidden honeypot field silently drops basic spam bots.
-- **TODOs in `route.ts`:** forward each lead to email and to the LotStack CRM API. All credentials come from environment variables; see `.env.example` for the names (`QUOTE_NOTIFY_EMAIL`, `EMAIL_PROVIDER_API_KEY`, `LOTSTACK_API_URL`, `LOTSTACK_API_KEY`). Never commit secrets.
-- Have the texting-consent wording (`quoteForm.smsConsentLabel`) reviewed for your SMS provider and TCPA requirements before you send texts.
+The form asks everything the price list needs, so every request can be priced instantly on the backend:
+
+1. **About you:** name, phone, email, and customer type (homeowner, dealer, developer, investor).
+2. **Property:** street (optional), city, state, ZIP.
+3. **The home:** single wide, double wide, or triple+; number of homes; size (W × L); where the home is now.
+4. **Site & foundation:** pad needed (yes/no/not sure); standard piers vs. concrete footers.
+5. **Services:** skirting (none/vinyl/brick), plus checkboxes for installation, trim out, deck, grading/landscaping, driveway, mechanical, electrical, plumbing, and demolition (with square footage).
+6. **Timing & notes:** target date, notes, texting consent.
+
+How it flows (`app/api/quote/route.ts`):
+
+- **Validation.** The browser and server share the same rules (`lib/quote.ts`). A hidden honeypot field drops basic spam bots.
+- **Instant estimate.** `lib/pricing.ts` builds a low–high estimate from the fulfillment partner's price list (Nov 9).
+  - Per-home items are multiplied by the number of homes. Demolition is a one-time item.
+  - Anything that can't be priced automatically sets **Needs Review** with a reason: triple-wides, "not sure" answers, or demolition without square footage.
+  - `MARKUP_PERCENT` in that file adds your margin. It's currently 0, so the estimate is the partner's price.
+- **The estimate is internal.** It's written to Smartsheet for the team and is never shown to the visitor.
+- **Smartsheet.** Each request becomes a row in the **"MHS Pros"** sheet, newest at the top (`lib/smartsheet.ts`).
+- **Logs.** Every request is also written to the logs (Vercel → Project → Logs, search `[quote]`), so nothing is lost if Smartsheet is down.
+
+### Smartsheet setup (one time)
+
+1. In Smartsheet: **Account → Personal Settings → API Access → Generate new access token**. Copy it.
+2. In Vercel: **mhs-pros → Settings → Environment Variables** → add `SMARTSHEET_ACCESS_TOKEN` with that token (Production, and Preview if you like). Then redeploy, or merge any change.
+3. The first quote request after that **creates the "MHS Pros" sheet automatically** in the token owner's Smartsheet, with all the columns. Later requests add rows. If the sheet already exists, the columns are matched by title and any missing ones are added.
+4. Optional: once the sheet exists, copy its ID (File → Properties) into `SMARTSHEET_SHEET_ID` to pin it. This skips the lookup by name.
+
+Never paste the token into the code or a chat. It belongs only in Vercel's environment variables.
+
+### Still to do
+- Forward leads to LotStack once that API is ready (`TODO(lotstack)` in `route.ts`; `LOTSTACK_API_URL` / `LOTSTACK_API_KEY`).
+- Have the texting-consent wording (`quoteForm.smsConsentLabel`) reviewed for your SMS provider and TCPA before sending texts.
 
 ## SEO
 
-Title, description, Open Graph/Twitter tags, and JSON-LD are all generated from `content/site.ts`. The JSON-LD describes MHSP as a general `LocalBusiness` (not a contractor), lists Shark Management Group, LLC as a `HomeAndConstructionBusiness`, and names Shark as the `provider` of every setup service. It also includes `FAQPage` markup. Rating/review markup is left out on purpose. Add it only once the ratings on the page are real.
+Title, description, Open Graph/Twitter tags, and JSON-LD are all generated from `content/site.ts`. The JSON-LD describes MHSP as a general `LocalBusiness` (not a contractor), with the licensing disclosure in its description. It also includes `FAQPage` markup. Rating/review markup is left out on purpose. Add it only once the ratings on the page are real.
 
 ## Project layout
 
@@ -162,6 +188,8 @@ components/
   Icon.tsx                inline SVG icons + star rating
 content/site.ts           ← ALL content lives here
 lib/quote.ts              shared form validation
+lib/pricing.ts            price list + instant estimate engine
+lib/smartsheet.ts         writes quote requests to the "MHS Pros" sheet
 public/brand/             real logo files
 public/placeholders/      placeholder images to replace
 ```
