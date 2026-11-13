@@ -95,8 +95,8 @@ The look is matched to the logo: retro Americana, cream paper, navy, and brick r
 | -------------------------------------- | ----------------------------------------------------------------------------- |
 | `public/brand/mhs-pros-logo-header.webp` | Logo without the tagline lines, used in the sticky header                    |
 | `public/brand/mhs-pros-logo-full.webp`   | Full logo lockup with tagline, used in the footer                            |
-| `public/brand/shark-management-logo.webp` | Shark Management Group full logo (transparent), used in the partnership section and footer |
-| `public/brand/shark-management-mark.webp` | Shark shark-fin emblem only (transparent), used in the header lockup       |
+| `public/brand/shark-management-logo.svg` | Shark Management Group official vector logo ("Licensed Setup Contractor"), used in the partnership section and footer |
+| `public/brand/shark-management-mark.svg` | Same artwork cropped to the shark-fin emblem, used in the header lockup     |
 | `app/icon.png`, `app/apple-icon.png`     | Browser tab / home-screen icon (the crew guy's face)                         |
 | `app/opengraph-image.jpg`                | Image shown when the link is shared (1200×630). Alt text is in `opengraph-image.alt.txt` |
 

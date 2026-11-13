@@ -78,19 +78,20 @@ export const partner = {
   licenseLine: "Manufactured-home installer license # PLACEHOLDER (state PLACEHOLDER)",
   // PLACEHOLDER — confirm Shark's general liability & workers' comp coverage before relying on this.
   insuranceLine: "Certificates of insurance available on request.",
-  // Full lockup (wordmark + tagline) — used in the partnership section and footer.
+  // Official vector logo supplied by Shark (transparent SVG).
+  // Full lockup (wordmark + "Licensed Setup Contractor") — used in the partnership section and footer.
   logo: {
-    src: "/brand/shark-management-logo.webp",
-    alt: "Shark Management Group, LLC logo — Disaster Relief & Recovery",
-    width: 980,
-    height: 548,
+    src: "/brand/shark-management-logo.svg",
+    alt: "Shark Management Group, LLC logo — Licensed Setup Contractor",
+    width: 1475,
+    height: 807,
   } satisfies ImageRef,
-  // Circular shark-fin emblem only — used in the compact header lockup.
+  // Circular shark-fin emblem only (same artwork, cropped viewBox) — used in the compact header lockup.
   mark: {
-    src: "/brand/shark-management-mark.webp",
+    src: "/brand/shark-management-mark.svg",
     alt: "Shark Management Group, LLC",
-    width: 355,
-    height: 355,
+    width: 570,
+    height: 570,
   } satisfies ImageRef,
 };
 
