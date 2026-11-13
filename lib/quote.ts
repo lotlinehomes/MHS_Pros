@@ -61,8 +61,8 @@ export type QuoteInput = {
   plumbing: boolean;
   demolition: boolean;
   demolitionSqFt: string;
-  // Timing & notes
-  targetDate: string;
+  // Timing & notes (the team schedules the date; the customer only says how soon)
+  timeframe: string;
   heardFrom: string;
   notes: string;
   photos: string[];
@@ -114,7 +114,7 @@ export const emptyQuote: QuoteInput = {
   plumbing: false,
   demolition: false,
   demolitionSqFt: "",
-  targetDate: "",
+  timeframe: "",
   heardFrom: "",
   notes: "",
   photos: [],
@@ -169,7 +169,7 @@ export function normalizeQuote(raw: unknown): QuoteInput {
     plumbing: bool(r.plumbing),
     demolition: bool(r.demolition),
     demolitionSqFt: str(r.demolitionSqFt, 8),
-    targetDate: str(r.targetDate, 10),
+    timeframe: str(r.timeframe, 40),
     heardFrom: str(r.heardFrom, 120),
     notes: str(r.notes, 2000),
     photos: Array.isArray(r.photos) ? r.photos.filter((p): p is string => typeof p === "string").slice(0, PHOTO_LIMITS.count + 1) : [],
@@ -218,7 +218,7 @@ export function validateQuote(q: QuoteInput): QuoteErrors {
     if (!Number.isInteger(sq) || sq < 50 || sq > 20000) e.demolitionSqFt = "Enter the approximate square footage (50–20,000).";
   }
   // Timing & details
-  if (q.targetDate && !isDate(q.targetDate)) e.targetDate = "Please pick a valid date.";
+  if (!oneOf(q.timeframe, o.timeframe)) e.timeframe = "Please pick one.";
   if (q.photos.length > PHOTO_LIMITS.count) e.photos = `Please send up to ${PHOTO_LIMITS.count} photos.`;
   else if (q.photos.some((p) => !PHOTO_DATA_URL.test(p))) e.photos = "One of the photos couldn't be read. Remove it and try again.";
   else if (q.photos.some((p) => dataUrlBytes(p) > PHOTO_LIMITS.eachBytes) || q.photos.reduce((s, p) => s + dataUrlBytes(p), 0) > PHOTO_LIMITS.totalBytes)

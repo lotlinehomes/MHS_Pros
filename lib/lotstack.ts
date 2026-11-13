@@ -90,27 +90,9 @@ export type LotStackPayload = {
 };
 
 const MESSAGE_MAX = 2000;
-const DAY = 86_400_000;
-
-/** LotStack's timeframe buckets, derived from the target setup date. */
-function timeframeFor(targetDate: string, now: Date): string {
-  if (!targetDate) return "Not sure yet";
-  const days = (Date.parse(targetDate) - now.getTime()) / DAY;
-  if (Number.isNaN(days)) return "Not sure yet";
-  if (days <= 30) return "Within 30 days";
-  if (days <= 90) return "1–3 months";
-  return "3+ months";
-}
-
-/** LotStack accepts a preferred date from tomorrow up to ~18 months out. */
-function preferredDateFor(targetDate: string, now: Date): string {
-  if (!targetDate) return "";
-  const t = Date.parse(targetDate);
-  return t >= now.getTime() && t <= now.getTime() + 540 * DAY ? targetDate : "";
-}
 
 /** Map validated form answers to LotStack's request. Anything without a field of its own goes in `message`. */
-export function buildLotStackRequest(q: QuoteInput, now = new Date()): LotStackPayload {
+export function buildLotStackRequest(q: QuoteInput): LotStackPayload {
   const width = HOME_WIDTH[q.homeType] ?? "unknown";
   const ids: string[] = [];
   const notes: string[] = [];
@@ -144,7 +126,6 @@ export function buildLotStackRequest(q: QuoteInput, now = new Date()): LotStackP
   if (q.plumbing) ids.push(S.plumbing);
   if (q.demolition) ids.push(S.demolition);
 
-  const preferredDate = preferredDateFor(q.targetDate, now);
   const details: [string, string][] = [
     ["Customer type", q.customerType],
     ["Homes", q.homeCount],
@@ -166,7 +147,6 @@ export function buildLotStackRequest(q: QuoteInput, now = new Date()): LotStackP
     ["Skirting", q.skirting],
     ["Deck size (sq ft)", q.deck ? q.deckSqFt : ""],
     ["Demolition (sq ft)", q.demolition ? q.demolitionSqFt : ""],
-    ["Target setup date", q.targetDate && !preferredDate ? q.targetDate : ""],
     ["SMS consent", q.smsConsent ? "Yes" : "No"],
   ];
   const header = [
@@ -189,8 +169,9 @@ export function buildLotStackRequest(q: QuoteInput, now = new Date()): LotStackP
     zip: q.zip,
     customerType: CUSTOMER_TYPE[q.customerType] ?? "Other",
     homeWidth: width,
-    timeframe: timeframeFor(q.targetDate, now),
-    preferredDate,
+    // How soon, in LotStack's own values; no date — the team schedules (2026-11-13).
+    timeframe: q.timeframe,
+    preferredDate: "",
     services: [...new Set(ids)],
     needsHome,
     homeConsent: needsHome && q.needHomeConsent,
