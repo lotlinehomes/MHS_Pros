@@ -61,7 +61,7 @@ That one file controls everything on the page. You shouldn't need to touch any c
 | Phone, email, hours, address, logo                       | `business`                                |
 | Licensing disclosure (footer)                            | `disclosure`, `fulfillment`               |
 | Quote form questions, answer choices, service checkboxes | `quoteForm`                               |
-| Prices used for the instant estimate                     | `lib/pricing.ts` (not `content/site.ts`)  |
+| Prices                                                   | **LotStack** Pricebook (not this repo)    |
 | Page title, meta description, share text                 | `seo`                                     |
 | Hero headline, subhead, buttons, trust strip             | `hero`                                    |
 | "Trusted by" partner logos                               | `logoBar.logos`                           |
@@ -131,39 +131,42 @@ JPG/PNG/WebP photos are resized and converted to AVIF/WebP automatically by `nex
 
 ---
 
-## The quote form → instant estimate → Smartsheet
+## The quote form → LotStack
 
-The form asks everything the price list needs, so every request can be priced instantly on the backend:
+**LotStack is the system of record.** Each website request goes to LotStack's set-up quote API. LotStack then:
+- creates the customer;
+- drafts a quote priced from the **Mobile Home Setup Pros Pricebook**;
+- emails the team.
 
-1. **About you:** name, phone, email, and customer type (homeowner, dealer, developer, investor).
-2. **Property:** street (optional), city, state, ZIP.
-3. **The home:** single wide, double wide, or triple+; number of homes; size (W × L); where the home is now.
-4. **Site & foundation:** pad needed (yes/no/not sure); standard piers vs. concrete footers.
-5. **Services:** skirting (none/vinyl/brick), plus checkboxes for installation, trim out, deck, grading/landscaping, driveway, mechanical, electrical, plumbing, and demolition (with square footage).
-6. **Timing & notes:** target date, notes, texting consent.
+From there the team reviews and sends the quote, and the customer signs, books and pays, all in LotStack. **The website never prices anything,** and customers don't see prices until the team sends the quote.
 
-How it flows (`app/api/quote/route.ts`):
+What the form asks (all choices live in `quoteForm` in `content/site.ts`):
 
-- **Validation.** The browser and server share the same rules (`lib/quote.ts`). A hidden honeypot field drops basic spam bots.
-- **Instant estimate.** `lib/pricing.ts` builds a low–high estimate from the fulfillment partner's price list (Nov 9).
-  - Per-home items are multiplied by the number of homes. Demolition is a one-time item.
-  - Anything that can't be priced automatically sets **Needs Review** with a reason: triple-wides, "not sure" answers, or demolition without square footage.
-  - `MARKUP_PERCENT` in that file adds your margin. It's currently 0, so the estimate is the partner's price.
-- **The estimate is internal.** It's written to Smartsheet for the team and is never shown to the visitor.
-- **Smartsheet.** Each request becomes a row in the **"MHS Pros"** sheet, newest at the top (`lib/smartsheet.ts`).
-- **Logs.** Every request is also written to the logs (Vercel → Project → Logs, search `[quote]`), so nothing is lost if Smartsheet is down.
+1. **About you:** name, phone, email, customer type, and company (shown for businesses).
+2. **Property:** street (optional), city, state (dropdown), ZIP, county, parcel ID.
+3. **The home:** width, number of homes, size, manufacturer, delivery date, where it is now, and whether they still need to buy a home. If they say yes, there's an OK-to-share checkbox for CostPlus Home Co.
+4. **Site & foundation:** pad and foundation (required), plus optional site questions: cleared/level, truck access, power, water, sewer, permit started.
+5. **Services:** skirting (none, vinyl, brick or block), plus checkboxes that map to Pricebook items. Deck and demolition ask for square footage.
+6. **Timing & details:** target date, how they heard about us, up to 6 photos, notes, and texting consent.
 
-### Smartsheet setup (one time)
+How it flows (`app/api/quote/route.ts` → `lib/lotstack.ts`):
 
-1. In Smartsheet: **Account → Personal Settings → API Access → Generate new access token**. Copy it.
-2. In Vercel: **mhs-pros → Settings → Environment Variables** → add `SMARTSHEET_ACCESS_TOKEN` with that token (Production, and Preview if you like). Then redeploy, or merge any change.
-3. The first quote request after that **creates the "MHS Pros" sheet automatically** in the token owner's Smartsheet, with all the columns. Later requests add rows. If the sheet already exists, the columns are matched by title and any missing ones are added.
-4. Optional: once the sheet exists, copy its ID (File → Properties) into `SMARTSHEET_SHEET_ID` to pin it. This skips the lookup by name.
+- **Validation.** The browser and server share the same rules (`lib/quote.ts`), with limits that mirror LotStack's own validator. A hidden honeypot drops basic spam bots.
+- **Mapping.** Each answer maps to a LotStack Pricebook item ID (`SERVICE_IDS` in `lib/lotstack.ts`). Width-specific items are chosen by home width (single- vs. double-wide set-up, trim and vinyl skirting).
+  - A triple-wide or "not sure" width sends a "price manually" note instead.
+  - Anything LotStack has no field for goes into the request's `message`: county, site conditions, sizes, square footage, and so on.
+- **Live check.** Before sending, the live LotStack service list is checked, so a retired Pricebook item can never make the whole request fail.
+- **Photos.** They're shrunk in the browser to stay within LotStack's limits (6 photos, 1 MB each, 3 MB total).
+- **Logs.** Every request is also logged (Vercel → Project → Logs, search `[quote]`). Search `LotStack send FAILED` to find any that need manual follow-up.
 
-Never paste the token into the code or a chat. It belongs only in Vercel's environment variables.
+### Setup
+
+Add `LOTSTACK_API_KEY` in Vercel (**mhs-pros → Settings → Environment Variables**), then redeploy. The key comes from LotStack and is sent as `Authorization: Bearer …`. Until it's set, requests are logged only. Never put the key in the code.
+
+### Prices
+Prices are edited in **LotStack → Set-Up → Pricebook**, not here. As of Nov 13, the default prices match the **high end** of the fulfillment partner's Nov 9 turnkey price list. The team adjusts each draft quote down after the site visit as needed.
 
 ### Still to do
-- Forward leads to LotStack once that API is ready (`TODO(lotstack)` in `route.ts`; `LOTSTACK_API_URL` / `LOTSTACK_API_KEY`).
 - Have the texting-consent wording (`quoteForm.smsConsentLabel`) reviewed for your SMS provider and TCPA before sending texts.
 
 ## SEO
@@ -188,8 +191,8 @@ components/
   Icon.tsx                inline SVG icons + star rating
 content/site.ts           ← ALL content lives here
 lib/quote.ts              shared form validation
-lib/pricing.ts            price list + instant estimate engine
-lib/smartsheet.ts         writes quote requests to the "MHS Pros" sheet
+lib/lotstack.ts           maps form answers → LotStack quote-request API
+lib/us-states.ts          state dropdown list
 public/brand/             real logo files
 public/placeholders/      placeholder images to replace
 ```

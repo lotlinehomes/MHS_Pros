@@ -415,28 +415,37 @@ export const quoteForm = {
   successHeading: "We got your request — we'll reach out within one business day.",
   successBody: "Need us sooner? Give us a call.",
   errorMessage: "Something went wrong sending your request. Please try again or call us.",
-  // Answer choices. The pricing engine (lib/pricing.ts) matches on these exact strings —
-  // if you rename one, update lib/pricing.ts too.
+  // Answer choices. lib/lotstack.ts maps these exact strings to LotStack's values —
+  // if you rename one, update the matching map in lib/lotstack.ts too.
   options: {
-    customerType: ["Homeowner", "Dealer", "Land developer", "Investor", "Other"],
-    homeType: ["Single wide", "Double wide", "Triple wide or larger"],
+    customerType: ["Homeowner", "Dealer / retailer", "Developer", "Park / community", "Manufacturer", "Investor", "Other"],
+    homeType: ["Single wide", "Double wide", "Triple wide or larger", "Not sure yet"],
     homeStatus: ["Already on site", "Being delivered", "Purchased, not scheduled", "Still shopping"],
+    needHome: ["Yes", "No"],
     pad: ["Yes", "No", "Not sure"],
     foundation: ["Standard piers (included)", "Concrete footers", "Not sure"],
-    skirting: ["None", "Vinyl", "Brick"],
+    yesNoUnsure: ["Yes", "No", "Not sure"],
+    water: ["City / public", "Well", "Not yet", "Not sure"],
+    sewer: ["City / public", "Septic", "Not yet", "Not sure"],
+    skirting: ["None", "Vinyl", "Brick", "Block"],
   },
-  // Optional add-on services (checkboxes). Keys are fixed; labels/hints are editable.
+  // Optional add-on services (checkboxes). Keys are fixed (lib/lotstack.ts maps them to LotStack
+  // price-list items); labels and hints are editable.
   services: [
     { key: "installation", label: "Home installation", hint: "Blocking, leveling, tie-downs, vapor barrier, roof cap, and joining sections" },
     { key: "trimOut", label: "Trim out", hint: "Interior & exterior trim after the set" },
-    { key: "deck", label: "Deck", hint: "Entry deck / landing" },
+    { key: "deck", label: "Deck", hint: "Pressure-treated deck" },
+    { key: "steps", label: "Steps with 5×5 landing" },
     { key: "gradingLandscaping", label: "Final grading / landscaping" },
     { key: "driveway", label: "Driveway" },
-    { key: "mechanical", label: "Mechanical (HVAC)" },
-    { key: "electrical", label: "Electrical hookup" },
-    { key: "plumbing", label: "Plumbing hookup" },
+    { key: "mechanical", label: "HVAC (heat pump)" },
+    { key: "electrical", label: "Electrical hookup", hint: "Meter base to panel" },
+    { key: "plumbing", label: "Plumbing, sewer & water hookup" },
     { key: "demolition", label: "Demolition of an existing home or structure" },
   ],
+  needHomeConsentLabel:
+    "It's OK to share my details with CostPlus Home Co., our home partner, so they can help me find a home.",
+  photosHint: "Up to 6 photos of the lot or home. They help us quote accurately.",
   sections: {
     contact: "About you",
     property: "Property location",
