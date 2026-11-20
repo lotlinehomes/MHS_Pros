@@ -2,7 +2,17 @@
 
 import { useId, useRef, useState } from "react";
 import { business, quoteForm } from "@/content/site";
-import { dataUrlBytes, emptyQuote, PHOTO_LIMITS, type QuoteErrors, type QuoteInput, validateQuote } from "@/lib/quote";
+import {
+  dataUrlBytes,
+  emptyQuote,
+  enforceFoundationRule,
+  PHOTO_LIMITS,
+  type DrywallAnswer,
+  type FoundationChoice,
+  type QuoteErrors,
+  type QuoteInput,
+  validateQuote,
+} from "@/lib/quote";
 import { US_STATES } from "@/lib/us-states";
 import { Icon } from "@/components/Icon";
 
@@ -13,6 +23,12 @@ const inputCls =
   "mt-1.5 block w-full rounded-lg border-2 border-navy-900/40 bg-white px-3.5 py-3 text-base text-navy-950 placeholder:text-ink/60 focus:border-navy-900 focus:outline-none focus:ring-2 focus:ring-brick/40 aria-[invalid=true]:border-red-700";
 const pillCls =
   "flex cursor-pointer items-center gap-2.5 rounded-lg border-2 border-navy-900/40 bg-white px-3.5 py-3 text-base font-medium text-navy-900 has-[:checked]:border-navy-900 has-[:checked]:bg-cream-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brick";
+const cardCls =
+  "flex cursor-pointer items-start gap-2.5 rounded-lg border-2 border-navy-900/40 bg-white p-3.5 text-base text-navy-900 has-[:checked]:border-navy-900 has-[:checked]:bg-cream-200 has-[:checked]:shadow-retro-sm has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brick has-[:disabled]:cursor-not-allowed has-[:disabled]:border-navy-900/20 has-[:disabled]:bg-white has-[:disabled]:shadow-none";
+const standardBadgeCls =
+  "rounded-full border-2 border-navy-900 bg-navy-900 px-2 py-0.5 text-xs font-bold tracking-wide text-cream-50";
+const upgradeBadgeCls =
+  "rounded-full border-2 border-navy-900 bg-brick px-2 py-0.5 text-xs font-bold tracking-wide text-cream-50";
 const Req = () => (
   <span className="text-red-700" aria-hidden="true">
     *
@@ -66,6 +82,41 @@ export function QuoteForm() {
     if (errors[key]) setErrors((e) => ({ ...e, [key]: undefined }));
   }
 
+  function clearFoundationErrors() {
+    setErrors((e) => ({ ...e, drywall: undefined, foundation: undefined }));
+  }
+
+  /** Drywall homes are locked to concrete. Not sure and No keep the dirt pad unless the customer already chose concrete. */
+  function setDrywall(next: DrywallAnswer) {
+    setValues((v) => {
+      if (next === "yes") return { ...v, drywall: next, foundation: "concrete", concreteReason: "drywall" };
+      if (v.countyRequiresConcrete) return { ...v, drywall: next, foundation: "concrete", concreteReason: "county_lender" };
+      if (v.drywall === "yes" || v.foundation !== "concrete") {
+        return { ...v, drywall: next, foundation: "dirt_pad_abs", concreteReason: null };
+      }
+      return { ...v, drywall: next, concreteReason: "customer" };
+    });
+    clearFoundationErrors();
+  }
+
+  function setFoundation(next: FoundationChoice) {
+    setValues((v) => {
+      if (v.drywall === "yes") return v;
+      if (next === "dirt_pad_abs") return { ...v, foundation: next, concreteReason: null, countyRequiresConcrete: false };
+      return { ...v, foundation: next, concreteReason: v.countyRequiresConcrete ? "county_lender" : "customer" };
+    });
+    if (errors.foundation) setErrors((e) => ({ ...e, foundation: undefined }));
+  }
+
+  function setCounty(checked: boolean) {
+    setValues((v) => {
+      if (v.drywall === "yes") return { ...v, countyRequiresConcrete: checked, foundation: "concrete", concreteReason: "drywall" };
+      if (checked) return { ...v, countyRequiresConcrete: true, foundation: "concrete", concreteReason: "county_lender" };
+      return { ...v, countyRequiresConcrete: false, concreteReason: v.foundation === "concrete" ? "customer" : null };
+    });
+    if (errors.foundation) setErrors((e) => ({ ...e, foundation: undefined }));
+  }
+
   async function addPhotos(files: FileList | null) {
     if (!files?.length) return;
     setPhotoBusy(true);
@@ -95,7 +146,8 @@ export function QuoteForm() {
   async function onSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
     if (photoBusy) return;
-    const found = validateQuote(values);
+    const submission = enforceFoundationRule(values);
+    const found = validateQuote(submission);
     setErrors(found);
     const firstBad = Object.keys(found)[0];
     if (firstBad) {
@@ -107,7 +159,7 @@ export function QuoteForm() {
       const res = await fetch("/api/quote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: JSON.stringify(submission),
       });
       const data = (await res.json().catch(() => ({}))) as { ok?: boolean; errors?: QuoteErrors };
       if (res.ok && data.ok) {
@@ -171,8 +223,14 @@ export function QuoteForm() {
   );
 
   /** Single-choice question rendered as tappable pills. */
-  const radios = (key: keyof QuoteInput, legend: string, choices: readonly string[], opts: { hint?: string; cols?: string; optional?: boolean } = {}) => {
-    const { hint, cols = "grid-cols-1 sm:grid-cols-3", optional = false } = opts;
+  const radios = (
+    key: keyof QuoteInput,
+    legend: string,
+    choices: readonly (string | { value: string; label: string })[],
+    opts: { hint?: string; cols?: string; optional?: boolean; onPick?: (value: string) => void } = {},
+  ) => {
+    const { hint, cols = "grid-cols-1 sm:grid-cols-3", optional = false, onPick } = opts;
+    const items = choices.map((c) => (typeof c === "string" ? { value: c, label: c } : c));
     return (
       <fieldset aria-describedby={[hint ? fid(`${key}-hint`) : "", errors[key] ? fid(`${key}-err`) : ""].filter(Boolean).join(" ") || undefined}>
         <legend className="text-sm font-bold text-navy-900">
@@ -184,14 +242,83 @@ export function QuoteForm() {
           </p>
         )}
         <div className={`mt-2 grid gap-2 ${cols}`}>
-          {choices.map((c) => (
-            <label key={c} className={pillCls}>
-              <input type="radio" name={key} value={c} checked={values[key] === c} onChange={() => set(key, c as never)} className="h-4 w-4 shrink-0 accent-brick" />
-              {c}
+          {items.map((c) => (
+            <label key={c.value} className={pillCls}>
+              <input
+                type="radio"
+                name={key}
+                value={c.value}
+                checked={values[key] === c.value}
+                onChange={() => (onPick ? onPick(c.value) : set(key, c.value as never))}
+                className="h-4 w-4 shrink-0 accent-brick"
+              />
+              {c.label}
             </label>
           ))}
         </div>
         {errorText(key)}
+      </fieldset>
+    );
+  };
+
+  const foundationCards = () => {
+    const spec = quoteForm.foundation;
+    const locked = values.drywall === "yes";
+    const note = values.drywall === "yes" ? spec.notes.yes : values.drywall === "unsure" ? spec.notes.unsure : "";
+    const describedBy = [fid("foundation-note"), errors.foundation ? fid("foundation-err") : ""].filter(Boolean).join(" ");
+    return (
+      <fieldset aria-describedby={describedBy}>
+        <legend className="text-sm font-bold text-navy-900">
+          {spec.legend} <Req />
+        </legend>
+        <div className="mt-2 grid items-start gap-3 sm:grid-cols-2">
+          {spec.choices.map((choice) => {
+            const disabled = locked && choice.value === "dirt_pad_abs";
+            return (
+              <div key={choice.value} className="flex flex-col gap-3">
+                <label aria-disabled={disabled || undefined} className={`${cardCls} ${disabled ? "cursor-not-allowed opacity-60" : ""}`}>
+                  <input
+                    type="radio"
+                    name="foundation"
+                    value={choice.value}
+                    checked={values.foundation === choice.value}
+                    disabled={disabled}
+                    onChange={() => setFoundation(choice.value)}
+                    className="mt-1 h-4 w-4 shrink-0 accent-brick disabled:cursor-not-allowed"
+                  />
+                  <span className="min-w-0">
+                    <span className="flex flex-wrap items-center gap-2">
+                      <span className="font-semibold leading-snug">{choice.label}</span>
+                      <span className={`${choice.value === "concrete" ? upgradeBadgeCls : standardBadgeCls} shrink-0 whitespace-nowrap`}>{choice.badge}</span>
+                    </span>
+                    <span className="mt-1 block text-sm font-normal leading-snug text-ink">{choice.line}</span>
+                  </span>
+                </label>
+                {choice.value === "concrete" && (
+                  <label className="flex cursor-pointer items-start gap-3 px-1 text-sm leading-relaxed text-navy-900">
+                    <input
+                      type="checkbox"
+                      name="countyRequiresConcrete"
+                      checked={values.countyRequiresConcrete}
+                      onChange={(e) => setCounty(e.target.checked)}
+                      className="mt-0.5 h-5 w-5 shrink-0 rounded accent-brick"
+                    />
+                    <span>{spec.countyLabel}</span>
+                  </label>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <p
+          id={fid("foundation-note")}
+          role="note"
+          aria-live="polite"
+          className={note ? "mt-3 rounded-lg border-2 border-navy-900/30 bg-white px-3 py-2 text-sm text-navy-900" : "sr-only"}
+        >
+          {note}
+        </p>
+        {errorText("foundation")}
       </fieldset>
     );
   };
@@ -299,8 +426,13 @@ export function QuoteForm() {
           t.site,
           4,
           <>
+            {radios("drywall", quoteForm.drywall.legend, quoteForm.drywall.choices, {
+              hint: quoteForm.drywall.hint,
+              cols: "grid-cols-3",
+              onPick: (value) => setDrywall(value as DrywallAnswer),
+            })}
+            {foundationCards()}
             {radios("pad", "Do you need a pad built for the home?", o.pad, { hint: "A level, compacted pad the home sits on.", cols: "grid-cols-3" })}
-            {radios("foundation", "Foundation", o.foundation, { hint: "Standard pier blocking is included with installation. Some sites or lenders require concrete footers." })}
             <p className="text-sm text-ink">A few quick site questions help us quote accurately. Skip any you don&apos;t know.</p>
             {radios("landCleared", "Is the land cleared and level?", o.yesNoUnsure, { optional: true, cols: "grid-cols-3" })}
             {radios("truckAccess", "Can a truck pulling the home reach the site?", o.yesNoUnsure, { optional: true, cols: "grid-cols-3" })}

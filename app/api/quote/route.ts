@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { normalizeQuote, validateQuote } from "@/lib/quote";
+import { enforceFoundationRule, normalizeQuote, validateQuote } from "@/lib/quote";
 import { buildLotStackRequest, lotstackEnabled, sendToLotStack } from "@/lib/lotstack";
 
 export const runtime = "nodejs";
@@ -23,7 +23,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "Invalid JSON" }, { status: 400 });
   }
 
-  const quote = normalizeQuote(raw);
+  // Coerce drywall=yes to concrete footers (reason "drywall") before the shared checks,
+  // so a modified browser cannot request a dirt pad for a drywall home.
+  const quote = enforceFoundationRule(normalizeQuote(raw));
 
   // Honeypot tripped → pretend success so bots don't learn anything, but drop the lead.
   if (quote.company_website) {

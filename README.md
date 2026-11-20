@@ -145,7 +145,7 @@ What the form asks (all choices live in `quoteForm` in `content/site.ts`):
 1. **About you:** name, phone, email, customer type, and company (shown for businesses).
 2. **Property:** street (optional), city, state (dropdown), ZIP, county, parcel ID.
 3. **The home:** width, number of homes, size, manufacturer, delivery date, where it is now, and whether they still need to buy a home. If they say yes, there's an OK-to-share checkbox for CostPlus Home Co.
-4. **Site & foundation:** pad and foundation (required), plus optional site questions: cleared/level, truck access, power, water, sewer, permit started.
+4. **Site & foundation:** whether the home has drywall (Sheetrock) walls, then the foundation — a dirt pad with ABS pad footers (standard, included) or concrete footers (required on drywall homes; otherwise optional, including when a county or lender requires them). Also whether a pad needs to be built, plus optional site questions: cleared/level, truck access, power, water, sewer, permit started.
 5. **Services:** skirting (none, vinyl, brick or block), plus checkboxes that map to Pricebook items. Deck and demolition ask for square footage.
 6. **Timing & details:** "When do you need it?" (As soon as possible / Within 30 days / 1–3 months / 3+ months / Not sure yet), how they heard about us, up to 6 photos, notes, and texting consent. Customers never pick a date; the team schedules it in LotStack.
 
@@ -154,6 +154,7 @@ How it flows (`app/api/quote/route.ts` → `lib/lotstack.ts`):
 - **Validation.** The browser and server share the same rules (`lib/quote.ts`), with limits that mirror LotStack's own validator. A hidden honeypot drops basic spam bots.
 - **Mapping.** Each answer maps to a LotStack Pricebook item ID (`SERVICE_IDS` in `lib/lotstack.ts`). Width-specific items are chosen by home width (single- vs. double-wide set-up, trim and vinyl skirting).
   - A triple-wide or "not sure" width sends a "price manually" note instead.
+  - Drywall, foundation, and why concrete was chosen (`drywall`, `foundation`, `concreteReason`) go out as their own fields. The live LotStack endpoint only reads fields it already knows, so these extras do not fail the request while that support is still landing. The same answers are also written in plain English in `message`. Concrete footers still map to that Pricebook item. The dirt-pad choice does not add a line — it is included.
   - Anything LotStack has no field for goes into the request's `message`: county, site conditions, sizes, square footage, and so on.
 - **Live check.** Before sending, the live LotStack service list is checked, so a retired Pricebook item can never make the whole request fail.
 - **Photos.** They're shrunk in the browser to stay within LotStack's limits (6 photos, 1 MB each, 3 MB total).
