@@ -9,6 +9,10 @@
  *   name, email, phone, state (2-letter), zip | address+city, customerType, homeWidth,
  *   timeframe, preferredDate, services (Pricebook item IDs), needsHome, homeConsent,
  *   photos (data URLs), heardFrom, message (≤2000), source, website (honeypot, must be empty).
+ *   Also drywall (yes|no|unsure), foundation (dirt_pad_abs|concrete), and concreteReason
+ *   (drywall|customer|county_lender|null). LotStack is adding those fields in a parallel
+ *   change. Today's validator copies only the keys it already knows, so the extras do not
+ *   fail a request that lands before that change. The same answers are repeated in `message`.
  *
  * No key is needed today: the endpoint accepts server-to-server POSTs (verified Nov 13).
  * Things to know:
@@ -22,7 +26,8 @@
  *   LOTSTACK_API_URL   defaults to https://lotstack.ai/api/setup/quote-requests
  *   LOTSTACK_DISABLED  set to "1" to stop sending (leads are then logged only).
  */
-import type { QuoteInput } from "@/lib/quote";
+import { quoteForm } from "@/content/site";
+import { concreteReasonPlain, drywallPlain, foundationPlain, type ConcreteReason, type DrywallAnswer, type FoundationChoice, type QuoteInput } from "@/lib/quote";
 
 const API_URL = () => process.env.LOTSTACK_API_URL || "https://lotstack.ai/api/setup/quote-requests";
 export const lotstackEnabled = () => process.env.LOTSTACK_DISABLED !== "1";
@@ -79,6 +84,12 @@ export type LotStackPayload = {
   homeWidth: string;
   timeframe: string;
   preferredDate: string;
+  /** yes | no | unsure */
+  drywall: DrywallAnswer;
+  /** dirt_pad_abs | concrete */
+  foundation: FoundationChoice;
+  /** drywall | customer | county_lender | null */
+  concreteReason: ConcreteReason;
   services: string[];
   needsHome: boolean;
   homeConsent: boolean;
@@ -99,7 +110,8 @@ export function buildLotStackRequest(q: QuoteInput): LotStackPayload {
   const S = SERVICE_IDS;
 
   if (q.pad === "Yes") ids.push(S.pad);
-  if (q.foundation === "Concrete footers") ids.push(S.concreteFooters);
+  // Concrete footers are the upgrade. The dirt pad with ABS pad footers is included — no line.
+  if (q.foundation === "concrete") ids.push(S.concreteFooters);
   if (q.installation) {
     if (width === "single") ids.push(S.setupSingle);
     else if (width === "double") ids.push(S.setupDouble);
@@ -137,7 +149,11 @@ export function buildLotStackRequest(q: QuoteInput): LotStackPayload {
     ["County", q.county],
     ["Parcel ID", q.parcelId],
     ["Pad needed", q.pad],
-    ["Foundation", q.foundation],
+    ["Drywall", drywallPlain(q.drywall)],
+    ["Foundation", foundationPlain(q.foundation)],
+    ["Concrete reason", concreteReasonPlain(q.concreteReason)],
+    ["County or lender also requires concrete footers", q.drywall === "yes" && q.countyRequiresConcrete ? "Yes" : ""],
+    ["Drywall follow-up", q.drywall === "unsure" ? quoteForm.foundation.notes.unsure : ""],
     ["Land cleared & level", q.landCleared],
     ["Truck access", q.truckAccess],
     ["Power on site", q.power],
@@ -171,6 +187,9 @@ export function buildLotStackRequest(q: QuoteInput): LotStackPayload {
     homeWidth: width,
     // How soon, in LotStack's own values; no date — the team schedules (2026-11-13).
     timeframe: q.timeframe,
+    drywall: q.drywall as DrywallAnswer,
+    foundation: q.foundation as FoundationChoice,
+    concreteReason: q.concreteReason,
     preferredDate: "",
     services: [...new Set(ids)],
     needsHome,

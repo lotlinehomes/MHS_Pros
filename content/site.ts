@@ -423,13 +423,51 @@ export const quoteForm = {
     homeStatus: ["Already on site", "Being delivered", "Purchased, not scheduled", "Still shopping"],
     needHome: ["Yes", "No"],
     pad: ["Yes", "No", "Not sure"],
-    foundation: ["Standard piers (included)", "Concrete footers", "Not sure"],
     yesNoUnsure: ["Yes", "No", "Not sure"],
     water: ["City / public", "Well", "Not yet", "Not sure"],
     sewer: ["City / public", "Septic", "Not yet", "Not sure"],
     skirting: ["None", "Vinyl", "Brick", "Block"],
     // LotStack's own timeframe values — sent as-is. The team schedules the actual date.
     timeframe: ["As soon as possible", "Within 30 days", "1–3 months", "3+ months", "Not sure yet"],
+  },
+  // Asked before the foundation cards. `value` is sent to LotStack — do not rename it.
+  // Standard foundation is a dirt pad with ABS pad footers (included). Concrete footers
+  // are an upgrade: required on drywall homes, optional otherwise. No prices on the form.
+  drywall: {
+    legend: "Does the home have drywall (Sheetrock) walls?",
+    hint: "Most newer homes with the factory sheetrock option are drywall. If you're not sure, we'll confirm from the model.",
+    choices: [
+      { value: "yes", label: "Yes" },
+      { value: "no", label: "No" },
+      { value: "unsure", label: "Not sure" },
+    ] as const,
+  },
+  foundation: {
+    legend: "Foundation",
+    choices: [
+      {
+        value: "dirt_pad_abs",
+        label: "Dirt pad with ABS pad footers",
+        badge: "Standard, included",
+        line: "Sufficient for most vinyl/VOG-wall homes.",
+      },
+      {
+        value: "concrete",
+        label: "Concrete footers",
+        badge: "Upgrade",
+        line: "Required for drywall homes. Also chosen when your county or lender requires it.",
+      },
+    ] as const,
+    countyLabel: "My county or lender requires concrete footers.",
+    notes: {
+      yes: "Concrete footers are required for drywall homes.",
+      unsure: "We'll confirm, and if it's drywall, concrete footers will be added.",
+    },
+    reasons: {
+      drywall: "Required for drywall homes",
+      customer: "Customer preference",
+      county_lender: "County or lender requires it",
+    },
   },
   // Optional add-on services (checkboxes). Keys are fixed (lib/lotstack.ts maps them to LotStack
   // price-list items); labels and hints are editable.

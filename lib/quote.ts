@@ -7,6 +7,18 @@ import { US_STATE_CODES } from "@/lib/us-states";
 
 const o = quoteForm.options;
 
+export type DrywallAnswer = (typeof quoteForm.drywall.choices)[number]["value"];
+export type FoundationChoice = (typeof quoteForm.foundation.choices)[number]["value"];
+export type ConcreteReason = keyof typeof quoteForm.foundation.reasons | null;
+
+const DRYWALL_VALUES: readonly DrywallAnswer[] = quoteForm.drywall.choices.map((c) => c.value);
+const FOUNDATION_VALUES: readonly FoundationChoice[] = quoteForm.foundation.choices.map((c) => c.value);
+
+export const drywallPlain = (v: string) => quoteForm.drywall.choices.find((c) => c.value === v)?.label ?? "";
+export const foundationPlain = (v: string) => quoteForm.foundation.choices.find((c) => c.value === v)?.label ?? "";
+export const concreteReasonPlain = (v: string | null) =>
+  v && v in quoteForm.foundation.reasons ? quoteForm.foundation.reasons[v as Exclude<ConcreteReason, null>] : "";
+
 /** Photo limits — same as LotStack's: up to 6, ≤1 MB each, ≤3 MB total (decoded). */
 export const PHOTO_LIMITS = { count: 6, eachBytes: 1_000_000, totalBytes: 3_000_000 } as const;
 const PHOTO_DATA_URL = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
@@ -40,7 +52,14 @@ export type QuoteInput = {
   needHomeConsent: boolean;
   // Site & foundation
   pad: string;
-  foundation: string;
+  /** yes | no | unsure. Empty until the customer answers. */
+  drywall: DrywallAnswer | "";
+  /** dirt_pad_abs (standard, included) or concrete (upgrade). */
+  foundation: FoundationChoice | "";
+  /** Why concrete was chosen. Null when the dirt pad stays. */
+  concreteReason: ConcreteReason;
+  /** Optional. Checking it selects concrete unless drywall already requires it. */
+  countyRequiresConcrete: boolean;
   landCleared: string;
   truckAccess: string;
   power: string;
@@ -94,7 +113,10 @@ export const emptyQuote: QuoteInput = {
   needHome: "",
   needHomeConsent: false,
   pad: "",
-  foundation: "",
+  drywall: "",
+  foundation: "dirt_pad_abs",
+  concreteReason: null,
+  countyRequiresConcrete: false,
   landCleared: "",
   truckAccess: "",
   power: "",
@@ -124,6 +146,10 @@ export const emptyQuote: QuoteInput = {
 
 const str = (v: unknown, max = 200) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 const bool = (v: unknown) => v === true;
+const oneOfReason = (v: unknown): ConcreteReason => {
+  const s = str(v, 40);
+  return s === "drywall" || s === "customer" || s === "county_lender" ? s : null;
+};
 
 /** Coerce unknown JSON into a QuoteInput with trimmed, length-capped strings. */
 export function normalizeQuote(raw: unknown): QuoteInput {
@@ -149,7 +175,10 @@ export function normalizeQuote(raw: unknown): QuoteInput {
     needHome: str(r.needHome, 10),
     needHomeConsent: bool(r.needHomeConsent),
     pad: str(r.pad, 20),
-    foundation: str(r.foundation, 40),
+    drywall: str(r.drywall, 10) as QuoteInput["drywall"],
+    foundation: str(r.foundation, 20) as QuoteInput["foundation"],
+    concreteReason: oneOfReason(r.concreteReason),
+    countyRequiresConcrete: bool(r.countyRequiresConcrete),
     landCleared: str(r.landCleared, 20),
     truckAccess: str(r.truckAccess, 20),
     power: str(r.power, 20),
@@ -201,9 +230,13 @@ export function validateQuote(q: QuoteInput): QuoteErrors {
   if (!oneOf(q.homeStatus, o.homeStatus)) e.homeStatus = "Please pick one.";
   if (q.deliveryDate && !isDate(q.deliveryDate)) e.deliveryDate = "Please pick a valid date.";
   if (!oneOf(q.needHome, o.needHome)) e.needHome = "Please pick one.";
-  // Site & foundation (pad and foundation required; the rest optional)
+  // Site & foundation (pad, drywall, and foundation required; the rest optional)
   if (!oneOf(q.pad, o.pad)) e.pad = "Please pick one.";
-  if (!oneOf(q.foundation, o.foundation)) e.foundation = "Please pick one.";
+  if (!oneOf(q.drywall, DRYWALL_VALUES)) e.drywall = "Please pick one.";
+  if (!oneOf(q.foundation, FOUNDATION_VALUES)) e.foundation = "Please pick one.";
+  else if (oneOf(q.drywall, DRYWALL_VALUES) && !foundationConsistent(q)) {
+    e.foundation = q.drywall === "yes" ? "Concrete footers are required for drywall homes." : "Please pick one.";
+  }
   for (const k of ["landCleared", "truckAccess", "power", "permitStarted"] as const) if (!optionalOneOf(q[k], o.yesNoUnsure)) e[k] = "Please pick one.";
   if (!optionalOneOf(q.water, o.water)) e.water = "Please pick one.";
   if (!optionalOneOf(q.sewer, o.sewer)) e.sewer = "Please pick one.";
@@ -224,4 +257,33 @@ export function validateQuote(q: QuoteInput): QuoteErrors {
   else if (q.photos.some((p) => dataUrlBytes(p) > PHOTO_LIMITS.eachBytes) || q.photos.reduce((s, p) => s + dataUrlBytes(p), 0) > PHOTO_LIMITS.totalBytes)
     e.photos = "Those photos are too large. Try fewer photos.";
   return e;
+}
+
+/** True when drywall, the foundation choice, and the concrete reason agree. */
+function foundationConsistent(q: QuoteInput): boolean {
+  if (q.drywall === "yes") return q.foundation === "concrete" && q.concreteReason === "drywall";
+  if (q.concreteReason === "county_lender") return q.foundation === "concrete" && q.countyRequiresConcrete;
+  if (q.concreteReason === "customer") return q.foundation === "concrete" && !q.countyRequiresConcrete;
+  if (q.concreteReason === null) return q.foundation === "dirt_pad_abs" && !q.countyRequiresConcrete;
+  return false;
+}
+
+/**
+ * Business rule (Alex, Nov 20 2026): a drywall home must be quoted with concrete
+ * footers, reason "drywall". Otherwise concrete is optional — the customer's own
+ * choice, or because their county or lender requires it. The dirt pad is the default.
+ * Called by /api/quote before validation so a tampered browser cannot skip it.
+ */
+export function enforceFoundationRule(q: QuoteInput): QuoteInput {
+  const county = q.countyRequiresConcrete || q.concreteReason === "county_lender";
+  if (q.drywall === "yes") {
+    return { ...q, foundation: "concrete", concreteReason: "drywall", countyRequiresConcrete: county };
+  }
+  if (county) {
+    return { ...q, foundation: "concrete", concreteReason: "county_lender", countyRequiresConcrete: true };
+  }
+  if (q.foundation === "concrete") {
+    return { ...q, concreteReason: "customer", countyRequiresConcrete: false };
+  }
+  return { ...q, concreteReason: null, countyRequiresConcrete: false };
 }
